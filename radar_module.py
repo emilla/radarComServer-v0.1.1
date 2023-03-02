@@ -52,9 +52,14 @@ class XMModule:
         return
 
     # activate module
-    async def initialize_module(self):
+    async def initialize_module(self, config_func=None):
         await self.stop_module()
         print("Module stopped")
+
+        # configure module if configFunc is provided
+        if config_func:
+            await config_func()
+
         # create & activate module
         self.main_control.value = 3
         await asyncio.sleep(0.3)
