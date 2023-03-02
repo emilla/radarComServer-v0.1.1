@@ -8,8 +8,8 @@ class Register:
     def __init__(self, address: int, rw: tuple, com: SerialCom) -> None:
         self.address = address
         self.value = None
-        self.write = (rw[1] == 'w')
-        self.read = (rw[0] == 'r')
+        self.write = rw[1]
+        self.read = rw[0]
         self.options = {}
         self.com = com
 
