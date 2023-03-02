@@ -1,5 +1,4 @@
 import serial
-from typing import Tuple
 
 
 class SerialCom:
@@ -14,15 +13,10 @@ class SerialCom:
         """
         self._port = serial.Serial(port, 115200, rtscts=rtscts, exclusive=True, timeout=timeout)
 
-    def read_packet(self, packet_type) -> Tuple[bytes, bytes]:
+    def read_packet_type(self, packet_type):
         """
-        Reads a packet of the given packet_type.
-
-        Args:
-            packet_type: The packet type to read.
-
-        Returns:
-            A tuple containing the header and payload of the packet.
+        Read any packet of packet_type. Any packages received with
+        another type is discarded.
         """
         while True:
             header, payload = self._read_packet()
@@ -30,13 +24,7 @@ class SerialCom:
                 break
         return header, payload
 
-    def _read_packet(self) -> Tuple[bytes, bytes]:
-        """
-        Reads a packet from the serial port.
-
-        Returns:
-            A tuple containing the header and payload of the packet.
-        """
+    def _read_packet(self):
         header = self._port.read(4)
         length = int.from_bytes(header[1:3], byteorder='little')
 
@@ -57,7 +45,7 @@ class SerialCom:
             [0xcd])
         self._port.write(data)
 
-        _header, payload = self.read_packet(0xF5)
+        _header, payload = self.read_packet_type(0xF5)
         assert payload[0] == addr
 
     def register_read(self, addr: int) -> int:
@@ -73,7 +61,7 @@ class SerialCom:
         data = bytes([0xcc, 0x01, 0x00, 0xf8, addr, 0xcd])
         self._port.write(data)
 
-        header, payload = self.read_packet(0xF6)
+        header, payload = self.read_packet_type(0xF6)
         assert payload[0] == addr, f"Expected addr {addr} but got {payload[0]}"
         assert len(payload) == 5, f"Expected payload length of 5 but got {len(payload)}"
 
@@ -93,7 +81,7 @@ class SerialCom:
             [0xcd])
         self._port.write(data)
 
-        header, payload = self.read_packet(0xF7)
+        header, payload = self.read_packet_type(0xF7)
         assert payload[0] == 0xE8, f"Expected buffer type 0xE8 but got {payload[0]}"
 
         return payload[1:]
@@ -105,7 +93,7 @@ class SerialCom:
         Returns:
             The bytes of the stream.
         """
-        header, payload = self.read_packet(0xFE)
+        header, payload = self.read_packet_type(0xFE)
         assert len(payload) > 0, "Empty payload received"
         assert payload[-1] == 0xCD, f"Invalid payload ending: {payload[-1]:#04x}"
         assert len(payload) - 1 == int.from_bytes(header[1:3],
