@@ -11,7 +11,7 @@ class PresenceDetector(radar_module.XMModule):
         super().__init__(mod_config, com_config)
 
         if not mod_config['range_start']:
-            mod_config['range_start'] = 0.5
+            mod_config['range_start'] = 5
 
         if not mod_config['range_length']:
             mod_config['range_length'] = 4
@@ -26,8 +26,8 @@ class PresenceDetector(radar_module.XMModule):
         # set mode to presence
         self.mode_selection.value = 0x200
         # set range
-        self.range_start.value = mod_config['range_start'] * 1000
-        self.range_length.value = mod_config['range_length'] * 1000
+        # self.range_start.value = mod_config['range_start'] * 1000
+        # self.range_length.value = mod_config['range_length'] * 1000
         self.update_rate.value = 1
 
         # detection status
