@@ -54,8 +54,10 @@ class XMModule:
     # activate module
     async def initialize_module(self):
         await self.stop_module()
+        print('Module stopped')
         # create & activate module
         self.main_control.value = 0x3
+        print('Module created')
         await asyncio.sleep(0.3)
 
     @staticmethod

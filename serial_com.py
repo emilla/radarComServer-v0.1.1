@@ -46,6 +46,7 @@ class SerialCom:
         payload = data[:-1]
         return header, payload
 
+
     def register_write(self, addr, value) -> None:
         """
         Writes a value to the given register address.
