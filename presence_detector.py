@@ -33,7 +33,7 @@ class PresenceDetector(radar_module.XMModule):
         # detection status
         self.detection_status = False
 
-    def start_detector(self, duration=60, func=None):
+    async def start_detector(self, duration=60, func=None):
         await self.initialize_module()
         start = time.monotonic()
         while time.monotonic() - start < duration:
