@@ -12,11 +12,12 @@ def main():
         'timeout': 2
     }
     mod_config = {
-        'range_start': 0.5,
+        'range_start': 5,
         'range_length': 4
     }
     detector = PresenceDetector(mod_config, com_config)
-    detector.start_detector()
+    print(detector.get_module_info())
+    # detector.start_detector()
 
 
 # Press the green button in the gutter to run the script.
