@@ -5,6 +5,14 @@ import asyncio
 display = Display(128, 64, 0x3C)
 
 
+def update_display(presence):
+    if presence:
+        display.draw_text('PERSON')
+    else:
+        display.draw_text('NOBODY')
+    display.clear_display()
+
+
 async def main():
     com_config = {
         'port': '/dev/ttyUSB0',
@@ -18,7 +26,8 @@ async def main():
     }
 
     detector = PresenceDetector(mod_config, com_config)
-    await detector.start_detector()
+
+    await detector.start_detector(duration=60, func=update_display)
 
 
 # Press the green button in the gutter to run the script.
