@@ -48,4 +48,4 @@ class PresenceDetector(radar_module.XMModule):
 
             print(f'Presence: {"True" if presence else "False"} score={score} distance={distance} m')
             if func:
-                func(presence, score, distance)
+                func(presence)
