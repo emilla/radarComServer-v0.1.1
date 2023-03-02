@@ -7,7 +7,7 @@ class ModuleError(Exception):
     """
 
 
-class ModuleCommunication:
+class SerialCom:
     """
     Simple class to communicate with the module software
     """
