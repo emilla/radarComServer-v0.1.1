@@ -7,11 +7,10 @@ class Register:
     """
     def __init__(self, address: int, rw: tuple, com: SerialCom) -> None:
         self.address = address
-        self.value = None
         self.write = rw[1]
         self.read = rw[0]
-        self.options = {}
         self.com = com
+        self.value = None
 
     @property
     def value(self) -> int:
@@ -21,8 +20,7 @@ class Register:
             raise ValueError('Register is not readable')
 
     @value.setter
-    def value(self, value: int) -> None:
-        # check if value is in options
+    def value(self, value: int):
         if self.write:
             self.com.register_write(self.address, value)
         else:
