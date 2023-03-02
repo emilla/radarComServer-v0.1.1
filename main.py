@@ -21,7 +21,7 @@ async def main():
     print(detector.get_module_info())
     print(detector.get_module_status())
     if detector.get_module_status() == 0:
-        await detector.initialize_module()
+        await detector.start_detector()
 
     # detector.start_detector()
 
