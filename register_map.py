@@ -1,4 +1,5 @@
 from serial_com import SerialCom
+import asyncio
 
 
 class Register:
@@ -20,11 +21,12 @@ class Register:
             raise ValueError('Register is not readable')
 
     @value.setter
-    def value(self, value: int):
+    async def value(self, value: int):
         if self.write:
             if value < 0 or value > 4294967295:
                 raise ValueError('Invalid value for register')
             else:
                 self.com.register_write(self.address, value)
+                await asyncio.sleep(0.1)
         else:
             raise ValueError('Register is not writable')
