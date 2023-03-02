@@ -1,4 +1,4 @@
-from display import Display
+from display.display import Display
 from presence_detector import PresenceDetector
 import asyncio
 
