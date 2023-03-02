@@ -48,19 +48,19 @@ class XMModule:
         self.main_control.value = 4
 
         # confirm module to be ready
-        async with self._value_matches(self, self.status, 0):
-            pass
+        await self._value_matches(self, self.status, 0)
+        return
 
     # activate module
     async def initialize_module(self):
         await self.stop_module()
-        print('Module stopped')
         # create & activate module
-        self.main_control.value = 0x3
-        print('Module created')
+        self.main_control.value = 3
+        await asyncio.sleep(0.3)
+
         # confirm module to be activated
-        async with self._value_matches(self, self.status, 0x2):
-            pass
+        await self._value_matches(self, self.status, 2)
+        return
 
     @staticmethod
     def _decode_streaming_buffer(stream):
