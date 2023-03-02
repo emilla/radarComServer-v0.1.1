@@ -5,12 +5,12 @@ class Register:
     """
     Class for a register in the register map.
     """
+
     def __init__(self, address: int, rw: tuple, com: SerialCom) -> None:
         self.address = address
         self.write = rw[1]
         self.read = rw[0]
         self.com = com
-        self.value = None
 
     @property
     def value(self) -> int:
@@ -22,6 +22,9 @@ class Register:
     @value.setter
     def value(self, value: int):
         if self.write:
-            self.com.register_write(self.address, value)
+            if value < 0 or value > 4294967295:
+                raise ValueError('Invalid value for register')
+            else:
+                self.com.register_write(self.address, value)
         else:
-            raise ValueError('Invalid value for register')
+            raise ValueError('Register is not writable')
