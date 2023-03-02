@@ -27,12 +27,13 @@ class PresenceDetector(radar_module.XMModule):
         self.mode_selection.value = 0x400
 
         # set presence detection configs
-        asyncio.run(self.configure_detector())
+        asyncio.sleep(0.5)
+
         # detection status
         self.detection_status = False
 
-    async def configure_detector(self):
-        await asyncio.sleep(0.5)
+    def configure_detector(self):
+        asyncio.sleep(0.5)
         self.range_start.value = self.mod_config['range_start'] * 100
         self.range_length.value = self.mod_config['range_length'] * 1000
         self.update_rate.value = 1000
