@@ -30,7 +30,5 @@ async def main():
     await detector.start_detector(duration=60, func=update_display)
 
 
-# Press the green button in the gutter to run the script.
-
 if __name__ == '__main__':
     asyncio.run(main())

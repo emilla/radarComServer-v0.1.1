@@ -27,9 +27,7 @@ class PresenceDetector(radar_module.XMModule):
         await self._value_matches(self, self.mode_selection, 0x400)
         print(f"Mode set to presence: {self.mode_selection.value:x}")
         self.range_start.value = 200
-        await self._value_matches(self, self.range_start, 200)
-        self.range_length.value = 5000
-        await self._value_matches(self, self.range_length, 5000)
+        self.range_length.value = 7000
         self.update_rate.value = 1000
 
     async def start_detector(self, duration=60, func=None):
