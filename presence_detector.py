@@ -37,7 +37,11 @@ class PresenceDetector(radar_module.XMModule):
         await self.initialize_module()
         start = time.monotonic()
         while time.monotonic() - start < duration:
-            stream = self.com.read_stream()
+            try:
+                stream = await asyncio.wait_for(self.com.read_stream(), timeout=1)
+            except asyncio.TimeoutError:
+                # handle timeout error
+                continue
             _result_info, buffer = self._decode_streaming_buffer(stream)
 
             (presence, score, distance) = struct.unpack("<bff", buffer)
