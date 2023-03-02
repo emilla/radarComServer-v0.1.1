@@ -10,12 +10,6 @@ class PresenceDetector(radar_module.XMModule):
     def __init__(self, mod_config, com_config):
         super().__init__(mod_config, com_config)
 
-        if not mod_config['range_start']:
-            mod_config['range_start'] = 5
-
-        if not mod_config['range_length']:
-            mod_config['range_length'] = 4
-
         # create properties for each register
         self.range_start = Register(address=0x20, rw=(True, True), com=self.com)
         self.range_length = Register(address=0x21, rw=(True, True), com=self.com)
@@ -34,12 +28,13 @@ class PresenceDetector(radar_module.XMModule):
 
     def configure_detector(self):
         asyncio.sleep(0.5)
-        self.range_start.value = self.mod_config['range_start'] * 100
-        self.range_length.value = self.mod_config['range_length'] * 1000
+        self.range_start.value = self.mod_config['range_start']
+        self.range_length.value = self.mod_config['range_length']
         self.update_rate.value = 1000
 
     async def start_detector(self, duration=60, func=None):
         await self.initialize_module()
+        self.configure_detector()
         start = time.monotonic()
         while time.monotonic() - start < duration:
             stream = self.com.read_stream()

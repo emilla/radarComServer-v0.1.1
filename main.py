@@ -13,16 +13,12 @@ async def main():
         'timeout': 2
     }
     mod_config = {
-        'range_start': 5,
-        'range_length': 4
+        'range_start': 300,
+        'range_length': 5000
     }
 
     detector = PresenceDetector(mod_config, com_config)
-    print(detector.get_module_info())
-    print(detector.get_module_status())
     await detector.start_detector()
-
-    # detector.start_detector()
 
 
 # Press the green button in the gutter to run the script.
