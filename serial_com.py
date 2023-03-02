@@ -41,6 +41,7 @@ class SerialCom:
         length = int.from_bytes(header[1:3], byteorder='little')
 
         data = self._port.read(length + 1)
+        print(data)
         assert data[-1] == 0xCD
         payload = data[:-1]
         return header, payload
