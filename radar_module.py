@@ -60,6 +60,7 @@ class XMModule:
 
         # confirm module to be activated
         await self._value_matches(self, self.status, 2)
+        print('Module activated')
         return
 
     @staticmethod
