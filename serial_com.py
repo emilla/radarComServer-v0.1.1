@@ -67,39 +67,26 @@ class SerialCom:
 
         return int.from_bytes(payload[1:], byteorder='little', signed=False)
 
-    def buffer_read(self, offset: int) -> bytes:
+    def buffer_read(self, offset):
         """
-        Reads the buffer starting from the given offset.
-
-        Args:
-            offset (int): The offset to start reading from.
-
-        Returns:
-            The bytes read from the buffer.
+        Read the buffer
         """
-        data = bytes([0xcc, 0x03, 0x00, 0xfa, 0xe8]) + offset.to_bytes(2, byteorder='little', signed=False) + bytes(
-            [0xcd])
+        data = bytearray()
+        data.extend(b'\xcc\x03\x00\xfa\xe8')
+        data.extend(offset.to_bytes(2, byteorder='little', signed=False))
+        data.append(0xcd)
         self._port.write(data)
 
-        header, payload = self.read_packet_type(0xF7)
-        assert payload[0] == 0xE8, f"Expected buffer type 0xE8 but got {payload[0]}"
-
+        _header, payload = self.read_packet_type(0xF7)
+        assert payload[0] == 0xE8
         return payload[1:]
 
-    def read_stream(self) -> bytes:
+    def read_stream(self):
         """
-        Reads a stream of data.
-
-        Returns:
-            The bytes of the stream.
+        Read a stream of data
         """
-        header, payload = self.read_packet_type(0xFE)
-        assert len(payload) > 0, "Empty payload received"
-        assert payload[-1] == 0xCD, f"Invalid payload ending: {payload[-1]:#04x}"
-        assert len(payload) - 1 == int.from_bytes(header[1:3],
-                                                  byteorder='little'), "Payload length does not match header"
-
-        return payload[:-1]
+        _header, payload = self.read_packet_type(0xFE)
+        return payload
 
     @staticmethod
     def _check_error(status: int) -> None:
