@@ -5,14 +5,18 @@ display = Display(128, 64, 0x3C)
 
 
 def main():
-    config = {
+    com_config = {
         'port': '/dev/ttyUSB0',
         'baudrate': 115200,
         'rtscts': True,
         'timeout': 2
     }
-    detector = PresenceDetector({}, config)
-    detector.start_detector(lambda x: display.draw_text(str(x)))
+    mod_config = {
+        'range_start': 0.5,
+        'range_length': 4
+    }
+    detector = PresenceDetector(mod_config, com_config)
+    detector.start_detector()
 
 
 # Press the green button in the gutter to run the script.
