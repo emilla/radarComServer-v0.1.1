@@ -17,6 +17,9 @@ def main():
     }
     detector = PresenceDetector(mod_config, com_config)
     print(detector.get_module_info())
+    print(detector.get_module_status())
+    if detector.get_module_status() == 0:
+        detector.start_detector()
     # detector.start_detector()
 
 

@@ -56,10 +56,7 @@ class XMModule:
         await self.stop_module()
         # create & activate module
         self.main_control.value = 0x3
-
-        # wait for module to be ready
-        async with self._value_matches(self, self.status, 0):
-            pass
+        await asyncio.sleep(0.3)
 
     @staticmethod
     def _decode_streaming_buffer(stream):
