@@ -54,6 +54,7 @@ class XMModule:
     # activate module
     async def initialize_module(self):
         await self.stop_module()
+        print("Module stopped")
         # create & activate module
         self.main_control.value = 3
         await asyncio.sleep(0.3)
