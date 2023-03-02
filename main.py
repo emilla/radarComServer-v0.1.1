@@ -19,7 +19,8 @@ def main():
     print(detector.get_module_info())
     print(detector.get_module_status())
     if detector.get_module_status() == 0:
-        await detector.start_detector()
+        detector.initialize_module()
+
     # detector.start_detector()
 
 
