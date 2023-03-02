@@ -8,7 +8,7 @@ class XMModule:
     def __init__(self, mod_config, com_config):
         self.mod_config = mod_config
         self.com_config = com_config
-        self.com = SerialCom(self.com_config)
+        self.com = SerialCom(port=self.com_config['port'], rtscts=self.com_config['rtscts'])
 
         # create properties for each register
         self.mode_selection = Register(address=0x2, rw=(True, True), com=self.com)
