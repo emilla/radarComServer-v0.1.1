@@ -1,17 +1,19 @@
+import time
 import serial
 
+class ModuleError(Exception):
+    """
+    One of the error bits was set in the module
+    """
 
-class SerialCom:
-    def __init__(self, port: str, rtscts: bool = True, timeout: int = 2) -> None:
-        """
-        Initializes the ModuleCommunication object.
 
-        Args:
-            port (str): The name of the serial port to use.
-            rtscts (bool, optional): Whether to use RTS/CTS flow control. Defaults to True.
-            timeout (int, optional): The timeout for serial communication. Defaults to 2 seconds.
-        """
-        self._port = serial.Serial(port, 115200, rtscts=rtscts, exclusive=True, timeout=timeout)
+class ModuleCommunication:
+    """
+    Simple class to communicate with the module software
+    """
+    def __init__(self, port, rtscts):
+        self._port = serial.Serial(port, 115200, rtscts=rtscts,
+                                   exclusive=True, timeout=2)
 
     def read_packet_type(self, packet_type):
         """
@@ -33,39 +35,31 @@ class SerialCom:
         payload = data[:-1]
         return header, payload
 
-    def register_write(self, addr, value) -> None:
+    def register_write(self, addr, value):
         """
-        Writes a value to the given register address.
-
-        Args:
-            addr (int): The address of the register to write to.
-            value (int): The value to write to the register.
+        Write a register
         """
-        data = bytes([0xcc, 0x05, 0x00, 0xf9, addr]) + value.to_bytes(4, byteorder='little', signed=False) + bytes(
-            [0xcd])
+        data = bytearray()
+        data.extend(b'\xcc\x05\x00\xf9')
+        data.append(addr)
+        data.extend(value.to_bytes(4, byteorder='little', signed=False))
+        data.append(0xcd)
         self._port.write(data)
-
         _header, payload = self.read_packet_type(0xF5)
         assert payload[0] == addr
 
-    def register_read(self, addr: int) -> int:
+    def register_read(self, addr):
         """
-        Reads the value of the given register address.
-
-        Args:
-            addr (int): The address of the register to read from.
-
-        Returns:
-            The value of the register.
+        Read a register
         """
-        data = bytes([0xcc, 0x01, 0x00, 0xf8, addr, 0xcd])
+        data = bytearray()
+        data.extend(b'\xcc\x01\x00\xf8')
+        data.append(addr)
+        data.append(0xcd)
         self._port.write(data)
-
-        header, payload = self.read_packet_type(0xF6)
-        assert payload[0] == addr, f"Expected addr {addr} but got {payload[0]}"
-        assert len(payload) == 5, f"Expected payload length of 5 but got {len(payload)}"
-
-        return int.from_bytes(payload[1:], byteorder='little', signed=False)
+        _header, payload = self.read_packet_type(0xF6)
+        assert payload[0] == addr
+        return int.from_bytes(payload[1:5], byteorder='little', signed=False)
 
     def buffer_read(self, offset):
         """
@@ -89,12 +83,41 @@ class SerialCom:
         return payload
 
     @staticmethod
-    def _check_error(status: int) -> None:
-        """
-        Checks if there is an error in the module status.
-
-        Args:
-            status (int): The module status to check.
-        """
+    def _check_error(status):
         ERROR_MASK = 0xFFFF0000
-        assert status & ERROR_MASK == 0, f"Error in module, status: 0x{status:08}"
+        if status & ERROR_MASK != 0:
+            ModuleError(f"Error in module, status: 0x{status:08X}")
+
+    @staticmethod
+    def _check_timeout(start, max_time):
+        if (time.monotonic() - start) > max_time:
+            raise TimeoutError()
+
+    def _wait_status_set(self, wanted_bits, max_time):
+        """
+        Wait for wanted_bits bits to be set in status register
+        """
+        start = time.monotonic()
+
+        while True:
+            status = self.register_read(0x6)
+            self._check_timeout(start, max_time)
+            self._check_error(status)
+
+            if status & wanted_bits == wanted_bits:
+                return
+            time.sleep(0.1)
+
+    def wait_start(self):
+        """
+        Poll status register until created and activated
+        """
+        ACTIVATED_AND_CREATED = 0x3
+        self._wait_status_set(ACTIVATED_AND_CREATED, 3)
+
+    def wait_for_data(self, max_time):
+        """
+        Poll status register until data is ready
+        """
+        DATA_READY = 0x00000100
+        self._wait_status_set(DATA_READY, max_time)
