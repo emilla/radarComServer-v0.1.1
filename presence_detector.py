@@ -1,43 +1,45 @@
 import radar_module
 import time
-import asyncio
 from register_map import Register
 import struct
 
 
 # detector class extends xm_module
 class PresenceDetector(radar_module.XMModule):
-    def __init__(self, mod_config, com_config):
-        super().__init__(mod_config, com_config)
+    def __init__(self, com_config):
+        super().__init__(com_config)
 
         # create properties for each register
         self.range_start = Register(address=0x20, rw=(True, True), com=self.com)
         self.range_length = Register(address=0x21, rw=(True, True), com=self.com)
         self.update_rate = Register(address=0x23, rw=(True, True), com=self.com)
 
-        # enable UART streaming
-        self.streaming_control.value = 0x1
-        # set mode to presence
-        self.mode_selection.value = 0x400
-
         # detection status
         self.detection_status = False
 
-    async def configure_detector(self):
-        await self._value_matches(self, self.mode_selection, 0x400)
-        print(f"Mode set to presence: {self.mode_selection.value:x}")
-        self.range_start.value = 200
-        await self._value_matches(self, self.range_start, 200)
-        self.range_length.value = 5000
-        await self._value_matches(self, self.range_length, 5000)
-        self.update_rate.value = 1000
+        # detector configuration
+        self.default_mod_config = {
+            self.range_start: 500,
+            self.range_length: 5000,
+            self.update_rate: 1000,
+            self.streaming_control: 0x1,
+            self.mode_selection: 0x400
+        }
 
-    async def start_detector(self, duration=60, func=None):
+    async def start_detector(self, new_mod_config=None, duration=60, func=None):
 
+        # update module config
+        if new_mod_config:
+            mod_config = new_mod_config
+        else:
+            mod_config = self.default_mod_config
+
+        # Initialize module with config function
         print("Starting detector")
-        await self.initialize_module(self.configure_detector)
-        print(f"range_start: {self.range_start.value}")
-        print(f"range_length: {self.range_length.value}")
+        await self._initialize_module(mod_config)
+
+        print(f"range_start: {self.range_start.get_value()}")
+        print(f"range_length: {self.range_length.get_value()}")
 
         start = time.monotonic()
         while time.monotonic() - start < duration:
@@ -49,3 +51,13 @@ class PresenceDetector(radar_module.XMModule):
             print(f'Presence: {"True" if presence else "False"} score={score} distance={distance} m')
             if func:
                 func(presence)
+
+    async def stop_module(self):
+        # stop module
+        await self.main_control.set_value(0)
+
+        # clear bits
+        await self.main_control.set_value(4)
+
+        # confirm module to be ready
+        return

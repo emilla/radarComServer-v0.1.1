@@ -20,13 +20,8 @@ async def main():
         'rtscts': True,
         'timeout': 2
     }
-    mod_config = {
-        'range_start': 300,
-        'range_length': 5000
-    }
 
-    detector = PresenceDetector(mod_config, com_config)
-
+    detector = PresenceDetector(com_config)
     await detector.start_detector(duration=60, func=update_display)
 
 

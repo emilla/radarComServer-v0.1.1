@@ -13,19 +13,30 @@ class Register:
         self.read = rw[0]
         self.com = com
 
-    @property
-    def value(self) -> int:
+        self._value = None
+
+    async def get_value(self) -> int:
+        """
+        Get the value of the register
+        :return: a byte array with the value of the register
+        """
         if self.read:
-            return self.com.register_read(self.address)
+            return await self.com.register_read(self.address)
         else:
             raise ValueError('Register is not readable')
 
-    @value.setter
-    def value(self, value: int):
+    async def set_value(self, value: int) -> None:
+        """
+        Set the value of the register
+        :param value: int value to set the register to
+        :return: None
+        """
         if self.write:
             if value < 0 or value > 4294967295:
                 raise ValueError('Invalid value for register')
             else:
                 self.com.register_write(self.address, value)
+                while value != await self.get_value():
+                    await asyncio.sleep(0.1)
         else:
             raise ValueError('Register is not writable')

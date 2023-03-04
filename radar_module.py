@@ -5,8 +5,7 @@ import asyncio
 
 
 class XMModule:
-    def __init__(self, mod_config, com_config):
-        self.mod_config = mod_config
+    def __init__(self, com_config):
         self.com_config = com_config
         self.com = SerialCom(port=self.com_config['port'], rtscts=self.com_config['rtscts'])
 
@@ -18,56 +17,43 @@ class XMModule:
         self.product_version = Register(address=0x11, rw=(True, False), com=self.com)
         self.streaming_control = Register(address=0x05, rw=(True, True), com=self.com)
 
-        # enable UART streaming
-        self.streaming_control.value = 0x1
-
     # get module information
-    def get_module_info(self):
-        return self.product_identification.value, self.product_version.value
+    async def get_module_info(self):
+        await self.streaming_control.set_value(0x1)
+        return await self.product_identification.get_value(), await self.product_version.get_value()
+
+    # get module status
+    async def get_module_status(self):
+        await self.streaming_control.set_value(0x1)
+        return await self.status.get_value()
 
     @staticmethod
-    async def _value_matches(self, register, value):
+    async def _configure_detector(register_value_list) -> None:
+        for register, value in register_value_list:
+            await register.set_value(value)
+
+    @staticmethod
+    async def _value_matches(register, wanted_value):
         # check if value matches
         duration = time.monotonic()
         while time.monotonic() - duration < 2:
-            if register.value == value:
+            if await register.get_value() == wanted_value:
                 return True
             await asyncio.sleep(0.1)
         return False
 
-    # get module status
-    def get_module_status(self):
-        return self.status.value
-
-    async def stop_module(self):
-        # stop module
-        self.main_control.value = 0
-        await asyncio.sleep(0.3)
-
-        # clear bits
-        self.main_control.value = 4
-
-        # confirm module to be ready
-        await self._value_matches(self, self.status, 0)
-        return
-
-    # activate module
-    async def initialize_module(self, config_func=None):
+    @staticmethod
+    async def _initialize_module(self, mod_config):
         await self.stop_module()
         print("Module stopped")
 
-        # configure module if configFunc is provided
-        if config_func:
-            await config_func()
+        self._configure_detector(mod_config)
 
         # create & activate module
-        self.main_control.value = 3
-        await asyncio.sleep(0.3)
+        await self.main_control.set_value(2)
 
         # confirm module to be activated
-        await self._value_matches(self, self.status, 2)
-        print('Module activated')
-        return
+        return await self._value_matches(self, self.status, 2)
 
     @staticmethod
     def _decode_streaming_buffer(stream):
