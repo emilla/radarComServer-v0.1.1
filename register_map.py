@@ -36,7 +36,6 @@ class Register:
                 raise ValueError('Invalid value for register')
             else:
                 self.com.register_write(self.address, value)
-                while value != await self.get_value():
-                    await asyncio.sleep(0.1)
+                await asyncio.sleep(0.3)
         else:
             raise ValueError('Register is not writable')
