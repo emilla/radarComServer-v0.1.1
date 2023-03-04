@@ -38,7 +38,7 @@ class XMModule:
         await self.stop_module()
         print("Module stopped")
 
-        self._configure_detector(mod_config)
+        await self._configure_detector(mod_config)
 
         # create & activate module
         await self.main_control.set_value(2)
