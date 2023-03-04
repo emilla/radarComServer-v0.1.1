@@ -29,9 +29,12 @@ class XMModule:
         return await self.status.get_value()
 
     @staticmethod
-    async def _configure_detector(register_value_list) -> None:
-        for register, value in register_value_list:
+    async def _configure_detector(register_value_tuple_array) -> None:
+        for entry in register_value_tuple_array:
+            register = entry[0]
+            value = entry[1]
             await register.set_value(value)
+
 
     @staticmethod
     async def _initialize_module(self, mod_config):

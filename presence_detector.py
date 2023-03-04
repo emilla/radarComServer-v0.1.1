@@ -25,14 +25,9 @@ class PresenceDetector(radar_module.XMModule):
             (self.streaming_control, 0x1),
             (self.mode_selection, 0x400),
         ]
+        # set default configuration
 
-    async def start_detector(self, new_mod_config=None, duration=60, func=None):
-
-        # update module config
-        if new_mod_config:
-            mod_config = new_mod_config
-        else:
-            mod_config = self.default_mod_config
+    async def start_detector(self, duration=60, func=None):
 
         # Initialize module with config function
         print("Starting detector")
