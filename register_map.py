@@ -20,9 +20,10 @@ class Register:
     @classmethod
     async def value_matches(cls, register, wanted_value):
         # check if value matches
+        cur_value = await register.get_value()
         duration = time.monotonic()
         while time.monotonic() - duration < 2:
-            if await register.get_value() == wanted_value:
+            if cur_value == wanted_value:
                 return True
             await asyncio.sleep(0.1)
         return False

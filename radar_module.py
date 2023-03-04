@@ -19,7 +19,9 @@ class XMModule:
     # get module information
     async def get_module_info(self):
         await self.streaming_control.set_value(0x1)
-        return await self.product_identification.get_value(), await self.product_version.get_value()
+        identification = await self.product_identification.get_value()
+        version = await self.product_version.get_value()
+        return identification, version
 
     # get module status
     async def get_module_status(self):

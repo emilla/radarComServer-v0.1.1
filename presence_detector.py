@@ -38,8 +38,8 @@ class PresenceDetector(radar_module.XMModule):
         print("Starting detector")
         await self._initialize_module(self, self.default_mod_config)
 
-        print(f"range_start: {self.range_start.get_value()}")
-        print(f"range_length: {self.range_length.get_value()}")
+        print(f"range_start: {await self.range_start.get_value()}")
+        print(f"range_length: {await self.range_length.get_value()}")
 
         start = time.monotonic()
         while time.monotonic() - start < duration:
