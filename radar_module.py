@@ -29,19 +29,20 @@ class XMModule:
         return await self.status.get_value()
 
     @staticmethod
-    async def _configure_detector(register_value_tuple_array) -> None:
-        for entry in register_value_tuple_array:
-            register = entry[0]
-            value = entry[1]
-            await register.set_value(value)
+    async def _configure_detector(self) -> None:
+        await self.mode_selection.set_value(0x400)
+        await self.range_start.set_value(500)
+        await self.range_length.set_value(5000)
+        await self.update_rate.set_value(1000)
+        await self.streaming_control.set_value(0x1)
 
 
     @staticmethod
-    async def _initialize_module(self, mod_config):
+    async def _initialize_module(self):
         await self.stop_module()
         print("Module stopped")
 
-        await self._configure_detector(mod_config)
+        await self._configure_detector(self)
 
         # create & activate module
         await self.main_control.set_value(2)

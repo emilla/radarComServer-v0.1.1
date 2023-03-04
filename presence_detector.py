@@ -31,7 +31,7 @@ class PresenceDetector(radar_module.XMModule):
 
         # Initialize module with config function
         print("Starting detector")
-        await self._initialize_module(self, self.default_mod_config)
+        await self._initialize_module(self)
 
         print(f"range_start: {await self.range_start.get_value()}")
         print(f"range_length: {await self.range_length.get_value()}")
