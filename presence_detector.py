@@ -18,13 +18,13 @@ class PresenceDetector(radar_module.XMModule):
         self.detection_status = False
 
         # detector configuration
-        self.default_mod_config = {
-            self.range_start: 500,
-            self.range_length: 5000,
-            self.update_rate: 1000,
-            self.streaming_control: 0x1,
-            self.mode_selection: 0x400
-        }
+        self.default_mod_config = [
+            (self.range_start, 500),
+            (self.range_length, 5000),
+            (self.update_rate, 1000),
+            (self.streaming_control, 0x1),
+            (self.mode_selection, 0x400),
+        ]
 
     async def start_detector(self, new_mod_config=None, duration=60, func=None):
 
