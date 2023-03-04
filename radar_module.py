@@ -1,7 +1,6 @@
 import time
 from register_map import Register
 from serial_com import SerialCom
-import asyncio
 
 
 class XMModule:
@@ -33,16 +32,6 @@ class XMModule:
             await register.set_value(value)
 
     @staticmethod
-    async def _value_matches(register, wanted_value):
-        # check if value matches
-        duration = time.monotonic()
-        while time.monotonic() - duration < 2:
-            if await register.get_value() == wanted_value:
-                return True
-            await asyncio.sleep(0.1)
-        return False
-
-    @staticmethod
     async def _initialize_module(self, mod_config):
         await self.stop_module()
         print("Module stopped")
@@ -53,7 +42,7 @@ class XMModule:
         await self.main_control.set_value(2)
 
         # confirm module to be activated
-        return await self._value_matches(self.status, 2)
+        return await Register.value_matches(self.status, 2)
 
     @staticmethod
     def _decode_streaming_buffer(stream):
