@@ -53,7 +53,7 @@ class XMModule:
         await self.main_control.set_value(2)
 
         # confirm module to be activated
-        return await self._value_matches(self, self.status, 2)
+        return await self._value_matches(self.status, 2)
 
     @staticmethod
     def _decode_streaming_buffer(stream):
