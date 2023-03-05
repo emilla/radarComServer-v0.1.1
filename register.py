@@ -20,18 +20,6 @@ class Register:
         return cls(address=register_dict['address'], rw=register_dict['rw'], com=com)
 
     @classmethod
-    def from_map_make_registers(cls, module, register_map: dict, com: SerialCom) -> None:
-        """
-        Create a register property for each register in the register map
-        :param register_map: dictionary with the register information
-        :param com: SerialCom object to communicate with the module
-        :return: Register object
-        :module: module to add the properties to
-        """
-        for key, value in register_map.items():
-            module.setattr(cls, key, cls.from_dict(value, com))
-
-    @classmethod
     async def value_matches(cls, register, wanted_value) -> bool:
         """
         Check if the value of the register matches the wanted value

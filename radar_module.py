@@ -36,7 +36,8 @@ class RadarModule:
         }
 
         # create properties for each register
-        Register.from_map_make_registers(self, self.register_map, self.com)
+        for key, value in self.register_map.items():
+            setattr(key, Register.from_dict(value, self.com))
 
         # get module information
 
