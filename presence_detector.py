@@ -50,7 +50,7 @@ class PresenceDetector(RadarModule):
         }
         # set default configuration
 
-    async def start_detector(self, duration=60, data_handler_func=None, mod_config=None):
+    async def start_presence_detector(self, duration=60, data_handler_func=None, mod_config=None):
         """
         Start detector and print results
         :param duration: duration in seconds
@@ -75,9 +75,6 @@ class PresenceDetector(RadarModule):
 
             stream = self.com.read_stream()
             _result_info, buffer = SerialCom.decode_streaming_buffer(stream)
-
-            # TODO: make this so that this can work with any mode_selection, right now it only works with 0x400,
-            #  which is the mode for presence detection. But results should be handled by the data_handler_func
 
             (presence, score, distance) = struct.unpack("<bff", buffer)
             print(f'Presence: {"True" if presence else "False"} score={score} distance={distance} m')

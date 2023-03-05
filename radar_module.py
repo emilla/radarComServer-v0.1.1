@@ -94,12 +94,13 @@ class RadarModule:
         update_rate,
         :return:  None
         """
+        print("Configuring detector")
         for key, value in config.items():
             # get register from instance of the class by name (key)
             register = getattr(self, key)
             # set value of current register
             await register.set_value(value)
-            print(f"{key} set to: {await register.get_value()}")
+            print(f"-{key} set to: {await register.get_value()}")
 
     @staticmethod
     async def _initialize_module(self, config=None):
@@ -113,7 +114,6 @@ class RadarModule:
             await self._stop_clear_module(self)
             print("Module stopped")
 
-            print("Configuring module")
             await self._configure_detector(self, config)
 
             # create & activate module
@@ -137,3 +137,4 @@ class RadarModule:
 
         cmd_clear_bits = 4
         await self.main_control.set_value(cmd_clear_bits)
+        print("Module stopped and cleared")
