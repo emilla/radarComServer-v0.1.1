@@ -1,11 +1,11 @@
-import radar_module
+from radar_module import RadarModule
 import time
-from register_map import Register
+from register import Register
 import struct
 
 
 # detector class extends xm_module
-class PresenceDetector(radar_module.XMModule):
+class PresenceDetector(RadarModule):
     def __init__(self, com_config):
         super().__init__(com_config)
 

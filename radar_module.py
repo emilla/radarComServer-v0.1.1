@@ -1,22 +1,66 @@
 import time
-from register_map import Register
-from serial_com import SerialCom
+from register import Register
+from communicator import SerialCom
 
 
-class XMModule:
+class RadarModule:
     def __init__(self, com_config):
         self.com_config = com_config
         self.com = SerialCom(port=self.com_config['port'], rtscts=self.com_config['rtscts'])
 
         # create properties for each register
-        self.mode_selection = Register(address=0x2, rw=(True, True), com=self.com)
-        self.main_control = Register(address=0x3, rw=(True, True), com=self.com)
-        self.status = Register(address=0x6, rw=(True, False), com=self.com)
-        self.product_identification = Register(address=0x10, rw=(True, False), com=self.com)
-        self.product_version = Register(address=0x11, rw=(True, False), com=self.com)
-        self.streaming_control = Register(address=0x05, rw=(True, True), com=self.com)
 
-    # get module information
+        self.mode_selection = {
+            'address': 0x2,
+            'rw': (True, True)
+        }
+        self.main_control = {
+            'address': 0x3,
+            'rw': (True, True)
+        }
+        self.status = {
+            'address': 0x6,
+            'rw': (True, False)
+        }
+        self.product_identification = {
+            'address': 0x10,
+            'rw': (True, False)
+        }
+        self.product_version = {
+            'address': 0x11,
+            'rw': (True, False)
+        }
+        self.streaming_control = {
+            'address': 0x05,
+            'rw': (True, True)
+        }
+
+        self.register_map = {
+            'mode_selection': {
+                'address': 0x2,
+                'rw': (True, True)
+            },
+            'main_control': {
+                'address': 0x3,
+                'rw': (True, True)
+            },
+            'status': {
+                'address': 0x6,
+                'rw': (True, False)
+            },
+            'product_identification': {
+                'address': 0x10,
+                'rw': (True, False)},
+            'product_version': {
+                'address': 0x11,
+                'rw': (True, False)},
+            'streaming_control': {
+                'address': 0x05,
+                'rw': (True, True)}
+        }
+
+        # get module information
+
     async def get_module_info(self):
         await self.streaming_control.set_value(0x1)
         identification = await self.product_identification.get_value()

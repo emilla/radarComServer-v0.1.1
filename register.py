@@ -1,4 +1,4 @@
-from serial_com import SerialCom
+from communicator import SerialCom
 import asyncio
 import time
 
@@ -7,10 +7,12 @@ class Register:
     """
     Class for a register in the register map.
     """
+
     @classmethod
     def from_dict(cls, register_dict: dict, com: SerialCom) -> 'Register':
         """
-        Create a register from a dictionary
+        Create a register from a dictionary, the dictionary should contain the "address" and the "rw" read/write
+        permissions
         :param register_dict: dictionary with the register information
         :param com: SerialCom object to communicate with the module
         :return: Register object
@@ -18,8 +20,24 @@ class Register:
         return cls(address=register_dict['address'], rw=register_dict['rw'], com=com)
 
     @classmethod
-    async def value_matches(cls, register, wanted_value):
-        # check if value matches
+    def from_map_make_registers(cls, register_map: dict, com: SerialCom) -> None:
+        """
+        Create a register property for each register in the register map
+        :param register_map: dictionary with the register information
+        :param com: SerialCom object to communicate with the module
+        :return: Register object
+        """
+        for key, value in register_map.items():
+            setattr(cls, key, cls.from_dict(value, com))
+
+    @classmethod
+    async def value_matches(cls, register, wanted_value) -> bool:
+        """
+        Check if the value of the register matches the wanted value
+        :param register:  Register object
+        :param wanted_value:  int value to check the register against
+        :return:  True if the value matches, False if not
+        """
         cur_value = await register.get_value()
         duration = time.monotonic()
         while time.monotonic() - duration < 2:
