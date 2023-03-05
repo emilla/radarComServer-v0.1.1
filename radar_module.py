@@ -5,10 +5,9 @@ from communicator import SerialCom
 
 class RadarModule:
     def __init__(self, com_config):
-        self.com_config = com_config
-        self.com = SerialCom(port=self.com_config['port'], rtscts=self.com_config['rtscts'])
+        self.com = SerialCom(port=com_config['port'], rtscts=com_config['rtscts'])
 
-        self.register_map = {
+        self.general_register_map = {
             'mode_selection': {
                 'address': 0x2,
                 'rw': (True, True)
@@ -35,11 +34,7 @@ class RadarModule:
             }
         }
 
-        # create properties for each register
-        for key, value in self.register_map.items():
-            setattr(self, key, Register.from_dict(value, self.com))
-
-        # get module information
+        self._make_registers(self, self.general_register_map)
 
     async def get_module_info(self):
         await self.streaming_control.set_value(0x1)
@@ -51,6 +46,12 @@ class RadarModule:
     async def get_module_status(self):
         await self.streaming_control.set_value(0x1)
         return await self.status.get_value()
+
+    # create properties for each register
+    @staticmethod
+    def _make_registers(self, register_map):
+        for key, value in register_map.items():
+            setattr(self, key, Register.from_dict(value, self.com))
 
     @staticmethod
     async def _configure_detector(self) -> None:
