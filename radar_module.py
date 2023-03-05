@@ -36,7 +36,7 @@ class RadarModule:
         }
 
         # create properties for each register
-        Register.from_map_make_registers(self.register_map, self.com)
+        Register.from_map_make_registers(self, self.register_map, self.com)
 
         # get module information
 
