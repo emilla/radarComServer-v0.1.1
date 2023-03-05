@@ -58,7 +58,9 @@ class RadarModule:
         # iterate over config dict and set values
         for key, value in config.items():
             print(f"{key}: {value}")
-            await getattr(self, key).set_value(value)
+            register = getattr(self, key)
+            await register.set_value(value)
+            print(f"Set {key} to {await register.get_value()}")
 
     @staticmethod
     async def _initialize_module(self, config=None):
