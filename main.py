@@ -15,7 +15,6 @@ def update_display(**kwargs):
 
 
 async def main():
-
     detector = PresenceDetector({
         'port': '/dev/ttyUSB0',
         'baudrate': 115200,
@@ -25,12 +24,14 @@ async def main():
     await detector.start_detector(duration=60,
                                   handle_data_func=update_display,
                                   mod_config={
-                                    'range_start': 500,
-                                    'range_length': 5000,
-                                    'update_rate': 1000,
-                                    'streaming_control': 0x1,
-                                    'mode_selection': 0x400,
-                                })
+                                      'streaming_control': 0x1,
+                                      'mode_selection': 0x400,
+                                      'range_start': 500,
+                                      'range_length': 5000,
+                                      'update_rate': 1000,
+
+                                  })
+
 
 if __name__ == '__main__':
     asyncio.run(main())

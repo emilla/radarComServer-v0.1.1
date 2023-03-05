@@ -29,11 +29,11 @@ class PresenceDetector(RadarModule):
 
         # detector configuration
         self.default_mod_config = {
+            'streaming_control': 0x1,
+            'mode_selection': 0x400,
             'range_start': 500,
             'range_length': 5000,
             'update_rate': 1000,
-            'streaming_control': 0x1,
-            'mode_selection': 0x400,
         }
         # set default configuration
 
