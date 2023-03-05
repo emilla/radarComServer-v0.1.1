@@ -49,7 +49,7 @@ class PresenceDetector(RadarModule):
         # Initialize module with config parameter, if none is given use default config
         if mod_config is None:
             mod_config = self.default_mod_config
-        await self._initialize_module(self, mod_config)
+        await super()._initialize_module(self, mod_config)
 
         # print measuring info
         print(f"range_start: {await self.range_start.get_value()}")
