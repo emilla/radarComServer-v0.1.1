@@ -26,6 +26,7 @@ class Register:
         :param register_map: dictionary with the register information
         :param com: SerialCom object to communicate with the module
         :return: Register object
+        :module: module to add the properties to
         """
         for key, value in register_map.items():
             module.setattr(cls, key, cls.from_dict(value, com))
