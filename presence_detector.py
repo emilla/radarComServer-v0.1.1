@@ -67,7 +67,7 @@ class PresenceDetector(RadarModule):
 
             print(f'Presence: {"True" if presence else "False"} score={score} distance={distance} m')
             if handle_data_func:
-                handle_data_func(presence, score, distance)
+                handle_data_func(presence=presence, score=score, distance=distance)
 
     async def stop_detector(self, clean_up_func=None):
         """
