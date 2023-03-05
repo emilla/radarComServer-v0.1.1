@@ -8,33 +8,6 @@ class RadarModule:
         self.com_config = com_config
         self.com = SerialCom(port=self.com_config['port'], rtscts=self.com_config['rtscts'])
 
-        # create properties for each register
-
-        self.mode_selection = {
-            'address': 0x2,
-            'rw': (True, True)
-        }
-        self.main_control = {
-            'address': 0x3,
-            'rw': (True, True)
-        }
-        self.status = {
-            'address': 0x6,
-            'rw': (True, False)
-        }
-        self.product_identification = {
-            'address': 0x10,
-            'rw': (True, False)
-        }
-        self.product_version = {
-            'address': 0x11,
-            'rw': (True, False)
-        }
-        self.streaming_control = {
-            'address': 0x05,
-            'rw': (True, True)
-        }
-
         self.register_map = {
             'mode_selection': {
                 'address': 0x2,
@@ -50,14 +23,20 @@ class RadarModule:
             },
             'product_identification': {
                 'address': 0x10,
-                'rw': (True, False)},
+                'rw': (True, False)
+            },
             'product_version': {
                 'address': 0x11,
-                'rw': (True, False)},
+                'rw': (True, False)
+            },
             'streaming_control': {
                 'address': 0x05,
-                'rw': (True, True)}
+                'rw': (True, True)
+            }
         }
+
+        # create properties for each register
+        Register.from_map_make_registers(self.register_map, self.com)
 
         # get module information
 
