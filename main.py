@@ -14,16 +14,22 @@ def update_display(presence):
 
 
 async def main():
-    com_config = {
+
+    detector = PresenceDetector({
         'port': '/dev/ttyUSB0',
         'baudrate': 115200,
         'rtscts': True,
         'timeout': 2
-    }
-
-    detector = PresenceDetector(com_config)
-    await detector.start_detector(duration=60, func=update_display)
-
+    })
+    await detector.start_detector(duration=60,
+                                  func=update_display,
+                                  mod_config={
+                                    'range_start': 500,
+                                    'range_length': 5000,
+                                    'update_rate': 1000,
+                                    'streaming_control': 0x1,
+                                    'mode_selection': 0x400,
+                                })
 
 if __name__ == '__main__':
     asyncio.run(main())

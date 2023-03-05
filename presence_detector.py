@@ -59,9 +59,8 @@ class PresenceDetector(RadarModule):
         print("Starting detector")
         start = time.monotonic()
         while time.monotonic() - start < duration:
+
             stream = self.com.read_stream()
-            # TODO: make decode_streaming_buffer accept a parameter for start and end of buffer as well as a parameter
-            #  for the offset of the buffer
             _result_info, buffer = SerialCom.decode_streaming_buffer(stream)
 
             (presence, score, distance) = struct.unpack("<bff", buffer)
