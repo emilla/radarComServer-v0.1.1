@@ -62,7 +62,7 @@ class RadarModule:
 
     @staticmethod
     async def _initialize_module(self, config=None):
-        await self.stop_module()
+        await self.stop_detector()
         print("Module stopped")
 
         print("Configuring module")

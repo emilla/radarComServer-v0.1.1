@@ -69,7 +69,7 @@ class PresenceDetector(RadarModule):
             if func:
                 func(presence)
 
-    async def stop_module(self):
+    async def stop_detector(self):
         """
         Stop module and clear bits
         :return:
