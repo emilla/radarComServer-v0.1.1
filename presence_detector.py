@@ -24,9 +24,6 @@ class PresenceDetector(RadarModule):
                 'rw': (True, True)
             }
         }
-        # self.range_start = Register(address=0x20, rw=(True, True), com=self.com)
-        # self.range_length = Register(address=0x21, rw=(True, True), com=self.com)
-        # self.update_rate = Register(address=0x23, rw=(True, True), com=self.com)
 
         self._make_registers(self, self.presence_register_map)
 
@@ -40,15 +37,26 @@ class PresenceDetector(RadarModule):
         }
         # set default configuration
 
-    async def start_detector(self, duration=60, func=None, config=None):
+    async def start_detector(self, duration=60, func=None, mod_config=None):
+        """
+        Start detector and print results
+        :param duration: duration in seconds
+        :param func: function to be called with presence as argument
+        :param mod_config: module configuration parameters. Requires keys: range_start, range_length, update_rate,
+        streaming_control, mode_selection or provide None to use default configuration
+        :return:
+        """
+        # Initialize module with config parameter, if none is given use default config
+        if mod_config is None:
+            mod_config = self.default_mod_config
+        await self._initialize_module(self, mod_config)
 
-        # Initialize module with config function
-        print("Starting detector")
-        await self._initialize_module(self, self.default_mod_config)
-
+        # print measuring info
         print(f"range_start: {await self.range_start.get_value()}")
         print(f"range_length: {await self.range_length.get_value()}")
 
+        # Run module
+        print("Starting detector")
         start = time.monotonic()
         while time.monotonic() - start < duration:
             stream = self.com.read_stream()
@@ -61,11 +69,12 @@ class PresenceDetector(RadarModule):
                 func(presence)
 
     async def stop_module(self):
-        # stop module
-        await self.main_control.set_value(0)
+        """
+        Stop module and clear bits
+        :return:
+        """
+        cmd_stop = 0
+        await self.main_control.set_value(cmd_stop)
 
-        # clear bits
-        await self.main_control.set_value(4)
-
-        # confirm module to be ready
-        return
+        cmd_clear_bits = 4
+        await self.main_control.set_value(cmd_clear_bits)

@@ -54,41 +54,43 @@ class RadarModule:
             setattr(self, key, Register.from_dict(value, self.com))
 
     @staticmethod
-    async def _configure_detector(self, config=None) -> None:
-        if config is None:
-            await self.mode_selection.set_value(0x400)
-            await self.range_start.set_value(400)
-            await self.range_length.set_value(5000)
-            await self.update_rate.set_value(1000)
-        else:
-            # iterate over config dict and set values
-            for register_name, value in config:
-                print(config)
-                await getattr(self, register_name).set_value(value)
-                print(f"Set {register_name} to {value}")
+    async def _configure_detector(self, config) -> None:
+        # iterate over config dict and set values
+        for key, value in config.items():
+            print(f"{key}: {value}")
+            await getattr(self, key).set_value(value)
 
     @staticmethod
     async def _initialize_module(self, config=None):
         await self.stop_module()
         print("Module stopped")
 
+        print("Configuring module")
         await self._configure_detector(self, config)
 
         # create & activate module
+        print("Activating module")
         await self.main_control.set_value(3)
 
         # confirm module to be activated
         return await Register.value_matches(self.status, 2)
 
-    # TODO: move this to communicator
+    #   TODO: move this to Register class
     @staticmethod
     def _decode_streaming_buffer(stream):
+        """
+        Decode streaming buffer
+        :param stream: streaming buffer
+        :return:  result_info, buffer (result_info is a dict with address as key and value as value)
+        """
+        # check if stream starts with 0xFD
         assert stream[0] == 0xFD
 
+        # offset to start of result info
         offset = 3
-
         result_info = {}
 
+        # read result info until 0xFE is reached
         while stream[offset] != 0xFE:
             address = stream[offset]
             offset += 1
@@ -96,5 +98,6 @@ class RadarModule:
             offset += 4
             result_info[address] = value
 
+        # read rest of buffer (contains data) and return it
         buffer = stream[offset + 3:]
         return result_info, buffer
