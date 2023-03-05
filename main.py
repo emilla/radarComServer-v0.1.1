@@ -6,6 +6,7 @@ display = Display(128, 64, 0x3C)
 
 
 def update_display(**kwargs):
+
     presence = kwargs['presence']
     if presence:
         display.draw_text('PERSON')
@@ -22,7 +23,7 @@ async def main():
         'timeout': 2
     })
     await detector.start_detector(duration=60,
-                                  handle_data_func=update_display,
+                                  data_handler_func=update_display,
                                   mod_config={
                                       'streaming_control': 0x1,
                                       'mode_selection': 0x400,

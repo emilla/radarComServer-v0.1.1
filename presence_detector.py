@@ -76,8 +76,10 @@ class PresenceDetector(RadarModule):
             stream = self.com.read_stream()
             _result_info, buffer = SerialCom.decode_streaming_buffer(stream)
 
-            (presence, score, distance) = struct.unpack("<bff", buffer)
+            # TODO: make this so that this can work with any mode_selection, right now it only works with 0x400,
+            #  which is the mode for presence detection. But results should be handled by the data_handler_func
 
+            (presence, score, distance) = struct.unpack("<bff", buffer)
             print(f'Presence: {"True" if presence else "False"} score={score} distance={distance} m')
             if data_handler_func:
                 data_handler_func(presence=presence, score=score, distance=distance)
