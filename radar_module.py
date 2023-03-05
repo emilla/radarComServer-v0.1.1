@@ -54,18 +54,23 @@ class RadarModule:
             setattr(self, key, Register.from_dict(value, self.com))
 
     @staticmethod
-    async def _configure_detector(self) -> None:
-        await self.mode_selection.set_value(0x400)
-        await self.range_start.set_value(500)
-        await self.range_length.set_value(5000)
-        await self.update_rate.set_value(1000)
+    async def _configure_detector(self, config=None) -> None:
+        if config is None:
+            await self.mode_selection.set_value(0x400)
+            await self.range_start.set_value(500)
+            await self.range_length.set_value(5000)
+            await self.update_rate.set_value(1000)
+        else:
+            # iterate over config dict and set values
+            for register_name, value in config:
+                await getattr(self, register_name).set_value(value)
 
     @staticmethod
-    async def _initialize_module(self):
+    async def _initialize_module(self, config=None):
         await self.stop_module()
         print("Module stopped")
 
-        await self._configure_detector(self)
+        await self._configure_detector(self, config)
 
         # create & activate module
         await self.main_control.set_value(3)
@@ -73,6 +78,7 @@ class RadarModule:
         # confirm module to be activated
         return await Register.value_matches(self.status, 2)
 
+    # TODO: move this to communicator
     @staticmethod
     def _decode_streaming_buffer(stream):
         assert stream[0] == 0xFD

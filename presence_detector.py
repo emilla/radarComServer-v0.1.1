@@ -10,28 +10,41 @@ class PresenceDetector(RadarModule):
         super().__init__(com_config)
 
         # create properties for each register
-        self.range_start = Register(address=0x20, rw=(True, True), com=self.com)
-        self.range_length = Register(address=0x21, rw=(True, True), com=self.com)
-        self.update_rate = Register(address=0x23, rw=(True, True), com=self.com)
+        self.presence_register_map = {
+            'range_start': {
+                'address': 0x20,
+                'rw': (True, True)
+            },
+            'range_length': {
+                'address': 0x21,
+                'rw': (True, True)
+            },
+            'update_rate': {
+                'address': 0x23,
+                'rw': (True, True)
+            }
+        }
+        # self.range_start = Register(address=0x20, rw=(True, True), com=self.com)
+        # self.range_length = Register(address=0x21, rw=(True, True), com=self.com)
+        # self.update_rate = Register(address=0x23, rw=(True, True), com=self.com)
 
-        # detection status
-        self.detection_status = False
+        self._make_registers(self, self.presence_register_map)
 
         # detector configuration
-        self.default_mod_config = [
-            (self.range_start, 500),
-            (self.range_length, 5000),
-            (self.update_rate, 1000),
-            (self.streaming_control, 0x1),
-            (self.mode_selection, 0x400),
-        ]
+        self.default_mod_config = {
+            'range_start': 500,
+            'range_length': 5000,
+            'update_rate': 1000,
+            'streaming_control': 0x1,
+            'mode_selection': 0x400,
+        }
         # set default configuration
 
-    async def start_detector(self, duration=60, func=None):
+    async def start_detector(self, duration=60, func=None, config=None):
 
         # Initialize module with config function
         print("Starting detector")
-        await self._initialize_module(self)
+        await self._initialize_module(self, config)
 
         print(f"range_start: {await self.range_start.get_value()}")
         print(f"range_length: {await self.range_length.get_value()}")
