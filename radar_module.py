@@ -57,7 +57,7 @@ class RadarModule:
     async def _configure_detector(self, config=None) -> None:
         if config is None:
             await self.mode_selection.set_value(0x400)
-            await self.range_start.set_value(500)
+            await self.range_start.set_value(400)
             await self.range_length.set_value(5000)
             await self.update_rate.set_value(1000)
         else:
