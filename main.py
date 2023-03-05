@@ -5,7 +5,8 @@ import asyncio
 display = Display(128, 64, 0x3C)
 
 
-def update_display(presence):
+def update_display(**kwargs):
+    presence = kwargs['presence']
     if presence:
         display.draw_text('PERSON')
     else:
@@ -22,7 +23,7 @@ async def main():
         'timeout': 2
     })
     await detector.start_detector(duration=60,
-                                  func=update_display,
+                                  handle_data_func=update_display,
                                   mod_config={
                                     'range_start': 500,
                                     'range_length': 5000,

@@ -37,11 +37,11 @@ class PresenceDetector(RadarModule):
         }
         # set default configuration
 
-    async def start_detector(self, duration=60, func=None, mod_config=None):
+    async def start_detector(self, duration=60, handle_data_func=None, mod_config=None):
         """
         Start detector and print results
         :param duration: duration in seconds
-        :param func: function to be called with presence as argument
+        :param handle_data_func: function to be called with presence as argument
         :param mod_config: module configuration parameters. Requires keys: range_start, range_length, update_rate,
         streaming_control, mode_selection or provide None to use default configuration
         :return:
@@ -66,16 +66,16 @@ class PresenceDetector(RadarModule):
             (presence, score, distance) = struct.unpack("<bff", buffer)
 
             print(f'Presence: {"True" if presence else "False"} score={score} distance={distance} m')
-            if func:
-                func(presence)
+            if handle_data_func:
+                handle_data_func(presence, score, distance)
 
-    async def stop_detector(self):
+    async def stop_detector(self, clean_up_func=None):
         """
-        Stop module and clear bits
+        Stop detector
+        :param clean_up_func: function to be called with is_stopped as argument (True if stopped, False if not)
         :return:
         """
-        cmd_stop = 0
-        await self.main_control.set_value(cmd_stop)
-
-        cmd_clear_bits = 4
-        await self.main_control.set_value(cmd_clear_bits)
+        is_stopped = await self._stop_clear_module(self)
+        if clean_up_func:
+            clean_up_func(is_stopped)
+        return is_stopped

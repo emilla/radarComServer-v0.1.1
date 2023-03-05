@@ -62,7 +62,7 @@ class RadarModule:
 
     @staticmethod
     async def _initialize_module(self, config=None):
-        await self.stop_detector()
+        await self._stop_clear_module(self)
         print("Module stopped")
 
         print("Configuring module")
@@ -74,3 +74,15 @@ class RadarModule:
 
         # confirm module to be activated
         return await Register.value_matches(self.status, 2)
+
+    @staticmethod
+    async def _stop_clear_module(self):
+        """
+        Stop module and clear bits
+        :return:
+        """
+        cmd_stop = 0
+        await self.main_control.set_value(cmd_stop)
+
+        cmd_clear_bits = 4
+        await self.main_control.set_value(cmd_clear_bits)
