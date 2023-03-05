@@ -63,7 +63,9 @@ class RadarModule:
         else:
             # iterate over config dict and set values
             for register_name, value in config:
+                print(config)
                 await getattr(self, register_name).set_value(value)
+                print(f"Set {register_name} to {value}")
 
     @staticmethod
     async def _initialize_module(self, config=None):
