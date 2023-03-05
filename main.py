@@ -5,11 +5,11 @@ import asyncio
 display = Display(128, 64, 0x3C)
 
 
-def detector_data_handler(**kwargs):
-    print(f'Presence: {"Person" if kwargs["presence"] else "Empty"} score={kwargs["score"]} '
-          f'distance={kwargs["distance"]} m')
+def detector_data_handler(presence, score, distance):
+    print(f'Presence: {"Person" if presence else "Empty"} score={score} '
+          f'distance={distance} m')
 
-    if kwargs['presence']:
+    if presence:
         display.draw_text('PERSON')
     else:
         display.draw_text('NOBODY')
