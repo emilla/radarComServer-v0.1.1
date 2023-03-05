@@ -1,6 +1,7 @@
 import time
 import serial
 
+
 class ModuleError(Exception):
     """
     One of the error bits was set in the module
@@ -11,6 +12,33 @@ class SerialCom:
     """
     Simple class to communicate with the module software
     """
+
+    @classmethod
+    def decode_streaming_buffer(cls, stream):
+        """
+        Decode streaming buffer
+        :param stream: streaming buffer
+        :return:  result_info, buffer (result_info is a dict with address as key and value as value)
+        """
+        # check if stream starts with 0xFD
+        assert stream[0] == 0xFD
+
+        # offset to start of result info
+        offset = 3
+        result_info = {}
+
+        # read result info until 0xFE is reached
+        while stream[offset] != 0xFE:
+            address = stream[offset]
+            offset += 1
+            value = int.from_bytes(stream[offset:offset + 4], byteorder='little')
+            offset += 4
+            result_info[address] = value
+
+        # read rest of buffer (contains data) and return it
+        buffer = stream[offset + 3:]
+        return result_info, buffer
+
     def __init__(self, port, rtscts):
         self._port = serial.Serial(port, 115200, rtscts=rtscts,
                                    exclusive=True, timeout=2)

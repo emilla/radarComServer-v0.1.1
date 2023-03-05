@@ -1,7 +1,7 @@
 from radar_module import RadarModule
 import time
-from register import Register
 import struct
+from communicator import SerialCom
 
 
 # detector class extends xm_module
@@ -60,7 +60,9 @@ class PresenceDetector(RadarModule):
         start = time.monotonic()
         while time.monotonic() - start < duration:
             stream = self.com.read_stream()
-            _result_info, buffer = self._decode_streaming_buffer(stream)
+            # TODO: make decode_streaming_buffer accept a parameter for start and end of buffer as well as a parameter
+            #  for the offset of the buffer
+            _result_info, buffer = SerialCom.decode_streaming_buffer(stream)
 
             (presence, score, distance) = struct.unpack("<bff", buffer)
 
