@@ -103,11 +103,12 @@ class PresenceDetector(RadarModule):
     def _validate_mod_config(mod_config):
         """
         checks that config dictionary contains all required keys
-        :param mod_config:  dictionary with the configuration parameters. Requires keys: range_start, range_length, update_rate,
+        :param mod_config:  dictionary with the configuration parameters. Requires keys: range_start, range_length, update_
+        rate,
         :return:
         """
         for key in ['range_start', 'range_length', 'update_rate', 'streaming_control', 'mode_selection']:
             # if key is not in config dictionary or value is not an integer raise error
-            if key not in mod_config or mod_config[key] is not int:
+            if key not in mod_config or not isinstance(mod_config[key], int):
                 raise ValueError(f'Missing register {key}, or value is not an integer')
         return True
