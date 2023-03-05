@@ -25,7 +25,7 @@ async def main():
     })
     await detector.start_presence_detector(
         duration=60,
-        data_handler_func=detector_data_handler(),
+        data_handler_func=detector_data_handler,
         mod_config={
             'streaming_control': 0x1,
             'mode_selection': 0x400,
