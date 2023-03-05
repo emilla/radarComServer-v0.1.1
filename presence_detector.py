@@ -77,7 +77,7 @@ class PresenceDetector(RadarModule):
             _result_info, buffer = SerialCom.decode_streaming_buffer(stream)
 
             (presence, score, distance) = struct.unpack("<bff", buffer)
-            print(f'Presence: {"True" if presence else "False"} score={score} distance={distance} m')
+
             if data_handler_func:
                 data_handler_func(presence=presence, score=score, distance=distance)
 
