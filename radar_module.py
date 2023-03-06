@@ -86,7 +86,7 @@ class RadarModule:
             setattr(self, key, Register.from_dict(value, self.com))
 
     @staticmethod
-    async def _configure_detector(self, config) -> None:
+    async def _configure_module(self, config) -> None:
         """
         Configure detector with config parameters in config dictionary
         :param self:  instance of the class
@@ -94,7 +94,9 @@ class RadarModule:
         update_rate,
         :return:  None
         """
-        print("Configuring detector")
+        if config is None:
+            return
+        print("Configuring Module")
         for key, value in config.items():
             # get register from instance of the class by name (key)
             register = getattr(self, key)
@@ -114,7 +116,7 @@ class RadarModule:
             await self._stop_clear_module(self)
             print("Module stopped")
 
-            await self._configure_detector(self, config)
+            await self._configure_module(self, config)
 
             # create & activate module
             print("Activating module")

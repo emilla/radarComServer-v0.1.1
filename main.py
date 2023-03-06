@@ -23,7 +23,7 @@ async def main():
         'rtscts': True,
         'timeout': 2
     })
-    await detector.start_presence_detector(
+    await detector.start_detection(
         duration=60,
         data_handler_func=detector_data_handler,
         mod_config={

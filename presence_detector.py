@@ -50,8 +50,9 @@ class PresenceDetector(RadarModule):
         }
         # set default configuration
 
-    async def start_presence_detector(self, duration=60, data_handler_func=None, mod_config=None):
+    async def start_detection(self, duration=60, data_handler_func=None, mod_config=None):
         """
+        Start detector and print results
         Start detector and print results
         :param duration: duration in seconds
         :param data_handler_func: function to be called with presence as argument
