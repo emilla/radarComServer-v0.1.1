@@ -18,8 +18,6 @@ def detector_data_handler(presence, score, distance):
 
 
 async def main():
-    await start_server()
-
     detector = PresenceDetector({
         'port': '/dev/ttyUSB0',
         'baudrate': 115200,
