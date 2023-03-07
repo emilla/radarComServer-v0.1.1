@@ -44,7 +44,8 @@ class RadarModule:
         await self.streaming_control.set_value(0x1)
         identification = await self.product_identification.get_value()
         version = await self.product_version.get_value()
-        return identification, version
+        status = await self.status.get_value()
+        return status, identification, version
 
     async def get_module_status(self):
         """
@@ -119,11 +120,12 @@ class RadarModule:
             await self._configure_module(self, config)
 
             # create & activate module
+            # TODO: split into two functions, one for creating and one for activating
             print("Activating module")
             await self.main_control.set_value(3)
 
             # confirm module to be activated
-            return await Register.value_matches(self.status, 2)
+            return await Register.value_matches(self.status, 1)
         except Exception as e:
             print(f"Error while initializing module: {e}")
             return False

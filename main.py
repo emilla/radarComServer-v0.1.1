@@ -2,6 +2,7 @@ from display.display import Display
 from presence_detector import PresenceDetector
 import asyncio
 
+
 display = Display(128, 64, 0x3C)
 
 
@@ -17,6 +18,8 @@ def detector_data_handler(presence, score, distance):
 
 
 async def main():
+    await start_server()
+
     detector = PresenceDetector({
         'port': '/dev/ttyUSB0',
         'baudrate': 115200,
@@ -32,8 +35,9 @@ async def main():
             'range_start': 500,
             'range_length': 5000,
             'update_rate': 1000,
+            'profile_selection': 5,
+            'sensor_power_mode': 3
         })
-
 
 if __name__ == '__main__':
     asyncio.run(main())

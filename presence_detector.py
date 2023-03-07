@@ -16,6 +16,7 @@ class PresenceDetector(RadarModule):
         :param com_config:  dictionary with the configuration for the serial communication. Should contain the port and
         rtscts settings (True or False)
         """
+        self.streaming = False
         super().__init__(com_config)
         # validate the configuration
         # create properties for each register
@@ -30,6 +31,14 @@ class PresenceDetector(RadarModule):
             },
             'update_rate': {
                 'address': 0x23,
+                'rw': (True, True)
+            },
+            'profile_selection': {
+                'address': 0x28,
+                'rw': (True, True)
+            },
+            'sensor_power_mode': {
+                'address': 0x25,
                 'rw': (True, True)
             }
         }
@@ -47,6 +56,8 @@ class PresenceDetector(RadarModule):
             'range_start': 500,
             'range_length': 5000,
             'update_rate': 1000,
+            'profile_selection': 5,
+            'sensor_power_mode': 3
         }
         # set default configuration
 
