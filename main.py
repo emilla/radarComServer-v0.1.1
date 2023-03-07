@@ -9,7 +9,10 @@ display = Display(128, 64, 0x3C)
 def detector_data_handler(presence, score, distance):
     print(f'Presence: {"Person" if presence else "Empty"} score={score} '
           f'distance={distance} m')
-
+    #formart score to 2 decimal places
+    score = "{:.2f}".format(score)
+    #convert score to string
+    score = str(score)
     if presence:
         display.draw_text(score)
     else:
