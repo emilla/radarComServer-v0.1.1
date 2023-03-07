@@ -8,7 +8,7 @@ display = Display(128, 64, 0x3C)
 def detector_data_handler(presence, score, distance):
     score = "{:.2f}".format(score)
     distance = "{:.1f}".format(distance)
-    print(f'Presence: {"Person" if presence else "Empty"} score={score}, distance={distance} meters')
+    print(f'Presence: {"Person" if presence else "Empty"} || score={score} || distance={distance} meters')
     # convert score to string
     score = str(score)
     if presence:
