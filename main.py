@@ -2,16 +2,15 @@ from display.display import Display
 from presence_detector import PresenceDetector
 import asyncio
 
-
 display = Display(128, 64, 0x3C)
 
 
 def detector_data_handler(presence, score, distance):
-    print(f'Presence: {"Person" if presence else "Empty"} score={score} '
-          f'distance={distance} m')
-    #formart score to 2 decimal places
+    print(f'Presence: {"Person" if presence else "Empty"} score={score}:.2f'
+          f'distance={distance}:.1f meters')
+    # format score to 2 decimal places
     score = "{:.2f}".format(score)
-    #convert score to string
+    # convert score to string
     score = str(score)
     if presence:
         display.draw_text(score)
@@ -39,6 +38,7 @@ async def main():
             'profile_selection': 5,
             'sensor_power_mode': 3
         })
+
 
 if __name__ == '__main__':
     asyncio.run(main())
