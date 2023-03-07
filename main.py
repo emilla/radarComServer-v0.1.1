@@ -6,10 +6,10 @@ display = Display(128, 64, 0x3C)
 
 
 def detector_data_handler(presence, score, distance):
-    print(f'Presence: {"Person" if presence else "Empty"} score={score}:.2f'
-          f'distance={distance}:.1f meters')
-    # format score to 2 decimal places
     score = "{:.2f}".format(score)
+    distance = "{:.1f}".format(distance)
+    print(f'Presence: {"Person" if presence else "Empty"} score={score}'
+          f'distance={distance} meters')
     # convert score to string
     score = str(score)
     if presence:
