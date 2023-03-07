@@ -11,9 +11,9 @@ def detector_data_handler(presence, score, distance):
           f'distance={distance} m')
 
     if presence:
-        display.draw_text('PERSON')
+        display.draw_text(score)
     else:
-        display.draw_text('NOBODY')
+        display.draw_text('Vacant')
     display.clear_display()
 
 
