@@ -116,7 +116,7 @@ async def start_detection(mod_config):
 async def stop_detection(message):
     global detector
     if detector is not None:
-        await detector.stop_detection()
+        await detector.stop_detector()
         detector = None
 
 

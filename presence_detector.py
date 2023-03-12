@@ -102,6 +102,7 @@ class PresenceDetector(RadarModule):
 
         # Stop module and clean up serial communication
         is_stopped = await super()._stop_clear_module(self)
+        print("Stopped detector was called")
 
         # function to be called after stopping the module, if given.
         if clean_up_func:
