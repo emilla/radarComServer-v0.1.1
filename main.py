@@ -32,6 +32,7 @@ async def message_router(websocket, path):
     # check if the client is a producer or consumer
     try:
         if path == '/consumer':
+            print("A consumer just connected")
             global consumers
             consumers.add(websocket)
             message = json.loads(websocket.recv())
