@@ -79,7 +79,7 @@ class Register:
                 await asyncio.sleep(0.1)
 
         else:
-            raise ValueError('Register is not readable')
+            return
 
     async def get_definition(self):
         """

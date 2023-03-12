@@ -89,6 +89,9 @@ async def open_serial_cmd(data):
 
     global detector
     detector = PresenceDetector(com_config)
+    status = await detector.get_module_status_definition()
+
+    print(f"Instance of PresenceDetector is available. Status: {status}")
     await asyncio.sleep(0.1)
 
 

@@ -1,5 +1,5 @@
 {"cmd": "start_detector",
-    {"data":
+    "data":
         {
             "streaming_control": "streaming_enabled",
             "mode_selection": "presence",
@@ -14,7 +14,7 @@
 {"cmd": "stop_detector", "data": "None"}
 
 {"cmd": "open_serial",
-    {"data":
+    "data":
         {
            "port": "/dev/ttyUSB0",
             "baudrate": "115200",
