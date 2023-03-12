@@ -146,7 +146,7 @@ class RadarModule:
                 print(f"-{key} set to: {await register.get_value()}")
             elif isinstance(value, str):
                 await register.set_by_definition(value)
-                print(f"-{key} set to: {await register.get_definition()}")
+                print(f"-{key} set to: {await register.get_value_with_definition()}")
 
     @staticmethod
     async def _create_module(self, config=None):
@@ -160,7 +160,7 @@ class RadarModule:
             await self._stop_clear_module(self)
             await self._configure_module(self, config)
             await self.main_control.set_value(1)
-            if not await Register.value_matches(self.status, 0x0008000):
+            if not await Register.value_matches(self.status, 1):
                 print(f"Module not ready, status: {await self.status.get_value()}")
                 return False
             return True
@@ -173,7 +173,7 @@ class RadarModule:
         print("Activating module")
         try:
             await self.main_control.set_value(2)
-            return await Register.value_matches(self.status, 1)
+            return await Register.value_matches(self.status, 2)
         except Exception as e:
             print(f"Error while activating module: {e}")
             return False
