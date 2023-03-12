@@ -62,8 +62,8 @@ async def message_router(websocket, path):
     except websockets.exceptions.ConnectionClosed as e:
         print("A client just disconnected")
 
-    finally:
-        consumers.remove(websocket)
+    # finally:
+    #     consumers.remove(websocket)
 
 
 async def consumer_request_handler(websocket, data):
