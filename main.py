@@ -29,13 +29,14 @@ def detector_data_handler(presence, score, distance):
 # Initialize detector
 async def message_router(websocket, path):
     global consumers, producer
-    # check if the client is a producer or consumer
     try:
         if path == '/consumer':
             print("A consumer just connected")
             global consumers
             consumers.add(websocket)
-            message = json.loads(websocket.recv())
+            payload = await websocket.recv()
+
+            message = json.loads(payload)
             if message.keys()[0] == 'req':
                 await consumer_request_handler(message['data'], websocket)
             elif message.keys()[0] == 'cmd':
@@ -130,6 +131,10 @@ async def broadcast_stream(message):
         await consumer.send(json.dumps(message))
 
 
+start_server = websockets.serve(message_router, address, PORT)
+asyncio.get_event_loop().run_until_complete(start_server)
+asyncio.get_event_loop().run_forever()
+
 # detector = PresenceDetector({
 #     'port': '/dev/ttyUSB0',
 #     'baudrate': 115200,
@@ -148,7 +153,3 @@ async def broadcast_stream(message):
 #         'profile_selection': 5,
 #         'sensor_power_mode': 3
 #     })
-
-start_server = websockets.serve(message_router, address, PORT)
-asyncio.get_event_loop().run_until_complete(start_server)
-asyncio.get_event_loop().run_forever()
