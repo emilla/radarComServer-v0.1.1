@@ -68,6 +68,8 @@ class Register:
             self.definitions = {v: k for k, v in self.options.items()}
         else:
             self.definitions = None
+        print(f"options: {self.options}")
+        print(f"definitions: {self.definitions}")
 
     async def get_value(self):
         """
