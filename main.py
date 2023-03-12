@@ -29,38 +29,39 @@ def detector_data_handler(presence, score, distance):
 # Initialize detector
 async def message_router(websocket, path):
     global consumers, producer
-    try:
-        if path == '/consumer':
-            print("A consumer just connected")
-            global consumers
-            consumers.add(websocket)
-            payload = await websocket.recv()
+    while True:
+        try:
+            if path == '/consumer':
+                print("A consumer just connected")
+                global consumers
+                consumers.add(websocket)
+                payload = await websocket.recv()
 
-            message = json.loads(payload)
-            if next(iter(message.keys())) == 'req':
-                await consumer_request_handler(websocket, message['data'])
-            elif next(iter(message.keys())) == 'cmd':
-                switcher = {
-                    'start_detection': start_detection,
-                    'stop_detection': stop_detection,
-                    'connect_to_radar_module': connect_to_radar_module
-                }
-                # Get the function from switcher dictionary and call it passing the data dictionary as argument
-                await switcher[message['cmd']](message['data'])
+                message = json.loads(payload)
+                if next(iter(message.keys())) == 'req':
+                    await consumer_request_handler(websocket, message['data'])
+                elif next(iter(message.keys())) == 'cmd':
+                    switcher = {
+                        'start_detection': start_detection,
+                        'stop_detection': stop_detection,
+                        'connect_to_radar_module': connect_to_radar_module
+                    }
+                    # Get the function from switcher dictionary and call it passing the data dictionary as argument
+                    await switcher[message['cmd']](message['data'])
 
-        elif path == '/producer':
-            global producer
-            if producer is None:
-                producer = websocket
-                message = json.loads(websocket.recv())
-                if message.keys()[0] == 'resp':
-                    await producer_response_handler(message['data'], websocket)
-                elif message.keys()[0] == 'stream':
-                    await broadcast_stream(message['data'], websocket)
+            elif path == '/producer':
+                global producer
+                if producer is None:
+                    producer = websocket
+                    message = json.loads(websocket.recv())
+                    if message.keys()[0] == 'resp':
+                        await producer_response_handler(message['data'], websocket)
+                    elif message.keys()[0] == 'stream':
+                        await broadcast_stream(message['data'], websocket)
 
-        # Handle disconnecting clients
-    except websockets.exceptions.ConnectionClosed as e:
-        print("A client just disconnected")
+            # Handle disconnecting clients
+        except websockets.exceptions.ConnectionClosed as e:
+            print("A client just disconnected")
 
     # finally:
     #     consumers.remove(websocket)
