@@ -27,7 +27,8 @@ def detector_data_handler(presence, score, distance, ws):
     display.clear_display()
 
     # Send data to all connected consumers
-    ws.send(f"{{\"presence\": {presence}, \"score\": {score}, \"distance\": {distance}}}")
+    message = {'stream': 'presence', 'data': {"presence": presence, "score": score, "distance": distance}}
+    ws.send(json.dumps(message))
 
 
 # Initialize detector
@@ -58,9 +59,9 @@ async def message_router(websocket, path):
                 if producer is None:
                     producer = websocket
                     message = json.loads(websocket.recv())
-                    if message.keys()[0] == 'resp':
+                    if next(iter(message.keys())) == 'resp':
                         await producer_response_handler(message['data'], websocket)
-                    elif message.keys()[0] == 'stream':
+                    elif next(iter(message.keys())) == 'stream':
                         await broadcast_stream(message['data'], websocket)
 
             # Handle disconnecting clients

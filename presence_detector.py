@@ -82,7 +82,7 @@ class PresenceDetector(RadarModule):
         await super()._initialize_module(self, mod_config)
 
         # open websocket connection to server
-        async with websockets.connect('ws://atom-radpi-01.local:7890') as ws:
+        async with websockets.connect('ws://atom-radpi-01.local:7890/producer') as ws:
             # Run module
             print("Starting detector")
             start = time.monotonic()
