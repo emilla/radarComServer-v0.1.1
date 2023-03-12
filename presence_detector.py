@@ -94,7 +94,7 @@ class PresenceDetector(RadarModule):
                 (presence, score, distance) = struct.unpack("<bff", buffer)
 
                 if data_handler_func:
-                    data_handler_func(presence=presence, score=score, distance=distance, ws=ws)
+                    await data_handler_func(presence=presence, score=score, distance=distance, ws=ws)
 
     async def stop_detector(self, clean_up_func=None):
         """

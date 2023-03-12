@@ -13,7 +13,7 @@ address = "atom-radpi-01.local"
 PORT = 7890
 
 
-def detector_data_handler(presence, score, distance, ws):
+async def detector_data_handler(presence, score, distance, ws):
     score = "{:.2f}".format(score)
     global display
     distance = "{:.1f}".format(distance)
@@ -28,7 +28,7 @@ def detector_data_handler(presence, score, distance, ws):
 
     # Send data to all connected consumers
     message = {'stream': 'presence', 'data': {"presence": presence, "score": score, "distance": distance}}
-    ws.send(json.dumps(message))
+    await ws.send(json.dumps(message))
 
 
 # Initialize detector
@@ -127,6 +127,7 @@ async def start_detection(data):
         'range_length': int(data['range_length']),
         'update_rate': int(data['update_rate']),
         'profile_selection': int(data['profile_selection']),
+        'sensor_power_mode': 3
     }
 
     global detector
