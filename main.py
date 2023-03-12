@@ -90,12 +90,19 @@ async def producer_response_handler(message):
         await consumer.send(message)
 
 
-def connect_to_radar_module(com_config):
+def connect_to_radar_module(data):
     """
     Create an instance of the PresenceDetector class and store it in the global variable detector.
-    :param com_config:
+    :param data: A dictionary containing the configuration data for the radar module
     :return:
     """
+    com_config = {
+        'port': data['port'],
+        'baudrate': data['baudrate'],
+        'rtscts': data['rtscts'],
+        'timeout': data['timeout']
+    }
+
     global detector
     detector = PresenceDetector(com_config)
 
