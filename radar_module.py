@@ -140,7 +140,6 @@ class RadarModule:
             # get register from instance of the class by name (key)
             register = getattr(self, key)
             # set value of current register
-            print(f"Setting {register} to {value} {type(value)}")
             if isinstance(value, int):
                 await register.set_value(value)
                 print(f"-{key} set to: {await register.get_value()}")
@@ -190,5 +189,5 @@ class RadarModule:
         cmd_clear_bits = 4
         await self.main_control.set_value(cmd_clear_bits)
         print("Module stopped and cleared")
-        if Register.value_matches(self.status, 0):
+        if await Register.value_matches(self.status, 0):
             return True
