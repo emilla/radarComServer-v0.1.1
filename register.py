@@ -64,7 +64,6 @@ class Register:
         self.options = options
         # reverse the options dictionary to get a dictionary with the values as keys and the keys as values
         if self.options:
-            print(f"options: {self.options}")
             self.definitions = {v: k for k, v in self.options.items()}
         else:
             self.definitions = None
@@ -96,8 +95,8 @@ class Register:
         if self.read:
             value = await self.get_value()
             print(f"get_definition value: {value}")
-            if value in self.definitions:
-                return self.definitions[value]
+            if value in self.options:
+                return self.options[value]
             else:
                 return 'This register does not have a definition'
         else:
