@@ -159,6 +159,9 @@ class RadarModule:
             await self._stop_clear_module(self)
             await self._configure_module(self, config)
             await self.main_control.set_value(1)
+            status_def = await self.status.get_value_with_definition()
+            status = await self.status.get_value()
+            print(f'Sensor status: {status} : { status_def}')
             if not await Register.value_matches(self.status, 1):
                 print(f"Module not ready, status: {await self.status.get_value()}")
                 return False
@@ -188,6 +191,9 @@ class RadarModule:
         """
         cmd_stop = 0
         await self.main_control.set_value(cmd_stop)
+        status_def = await self.status.get_value_with_definition()
+        status = await self.status.get_value()
+        print(f'Sensor status: {status} : { status_def}')
 
         cmd_clear_bits = 4
         await self.main_control.set_value(cmd_clear_bits)
