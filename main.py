@@ -46,7 +46,7 @@ async def message_router(websocket, path):
                     'connect_to_radar_module': connect_to_radar_module
                 }
                 # Get the function from switcher dictionary and call it passing the data dictionary as argument
-                await switcher[message['data']['type']](message['data'])
+                await switcher[message['cmd']](message['data'])
 
         elif path == '/producer':
             global producer
