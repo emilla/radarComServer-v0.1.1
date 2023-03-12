@@ -196,3 +196,5 @@ class RadarModule:
         cmd_clear_bits = 4
         await self.main_control.set_value(cmd_clear_bits)
         print("Module stopped and cleared")
+        if Register.value_matches(self.status, 0):
+            return True

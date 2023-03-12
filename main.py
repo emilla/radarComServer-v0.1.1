@@ -123,7 +123,6 @@ async def stop_detector_cmd(message):
     if detector is not None:
         if await detector.stop_detector():
             detector = None
-
         else:
             raise Exception('Failed to stop detector')
 
