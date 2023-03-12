@@ -147,10 +147,10 @@ class RadarModule:
             register = getattr(self, key)
             # set value of current register
             print(f"Setting {key} to {value}")
-            if value is type(int):
+            if isinstance(value, int):
                 await register.set_value(value)
                 print(f"-{key} set to: {await register.get_value()}")
-            elif value is type(str):
+            elif isinstance(value, str):
                 await register.set_by_definition(value)
                 print(f"-{key} set to: {await register.get_definition()}")
 
