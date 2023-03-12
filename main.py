@@ -37,9 +37,9 @@ async def message_router(websocket, path):
             payload = await websocket.recv()
 
             message = json.loads(payload)
-            if message.keys()[0] == 'req':
+            if next(iter(message.keys())) == 'req':
                 await consumer_request_handler(message['data'], websocket)
-            elif message.keys()[0] == 'cmd':
+            elif next(iter(message.keys())) == 'cmd':
                 switcher = {
                     'start_detection': start_detection_cmd,
                     'stop_detection': stop_detection_cmd,
