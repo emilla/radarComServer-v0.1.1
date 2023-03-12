@@ -113,7 +113,20 @@ async def get_status(websocket):
     if detector is None:
         status = 'Not connected'
     else:
-        status = await detector.get_module_status()
+        try:
+            status = await detector.get_module_status()
+            if status == 0:
+                status = 'Available'
+            elif status == 1:
+                status = 'Created'
+            elif status == 2:
+                status = 'Started'
+            else:
+                status = 'Error'
+
+        except Exception as e:
+            status = 'Unknown'
+
     await websocket.send(json.dumps({'resp': 'status',
                                      'data':
                                          {'module_status': status}
