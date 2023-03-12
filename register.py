@@ -92,13 +92,13 @@ class Register:
         Get the definition of the register
         :return: string with the definition of the register
         """
-        if self.read:
+        if self.read and self.options:
             value = await self.get_value()
             print(f"get_definition value: {value}")
             if value in self.options:
                 return self.options[value]
             else:
-                return 'This register does not have a definition'
+                return f'This value: {value} is not defined'
         else:
             raise ValueError('Register is not readable in get_definition')
 
