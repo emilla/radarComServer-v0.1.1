@@ -18,7 +18,11 @@ class Register:
         :param options:  dictionary with options for the register
         :return: Register object
         """
-        return cls(address=register_dict['address'], rw=register_dict['rw'], com=com, options=register_dict['options'])
+        if 'options' in register_dict:
+            options = register_dict['options']
+        else:
+            options = None
+        return cls(address=register_dict['address'], rw=register_dict['rw'], com=com, options=options)
 
     @classmethod
     async def definition_matches_value(cls, register, wanted_definition) -> bool:
