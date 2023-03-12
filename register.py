@@ -97,7 +97,7 @@ class Register:
             if value in self.options:
                 return self.options[value]
             else:
-                return
+                return f'Unknown value {value}'
         else:
             raise ValueError('This register does not have options')
 
