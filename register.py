@@ -93,7 +93,7 @@ class Register:
             else:
                 return 'This register does not have a definition'
         else:
-            raise ValueError('Register is not readable')
+            raise ValueError('Register is not readable in get_definition')
 
     async def set_value(self, value: int):
         """

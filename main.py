@@ -136,7 +136,7 @@ async def get_status_req(websocket):
         try:
             status = await detector.get_module_status_definition()
         except Exception as e:
-            status = 'Unknown'
+            status = f'Unknown error: {e}'
 
     await websocket.send(json.dumps({'resp': 'status',
                                      'data': {'module_status': status}}))
