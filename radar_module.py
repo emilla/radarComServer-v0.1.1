@@ -174,7 +174,7 @@ class RadarModule:
             await self.main_control.set_value(2)
             status_def = await self.status.get_value_with_definition()
             status = await self.status.get_value()
-            print(f'Sensor status: {status} : {await self.status_def}')
+            print(f'Sensor status: {status} : {status_def}')
             return await Register.value_matches(self.status, 2)
         except Exception as e:
             print(f"Error while activating module: {e}")
