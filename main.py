@@ -147,7 +147,7 @@ async def main():
     #     })
 
     start_server = websockets.serve(message_router, address, PORT)
-    asyncio.get_event_loop().run_until_complete(start_server)
+    await start_server
 
 
 if __name__ == '__main__':
