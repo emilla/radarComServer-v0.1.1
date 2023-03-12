@@ -119,7 +119,6 @@ async def stop_detection_cmd(message):
         detector = None
 
 
-
 async def get_status(websocket):
     global detector
     if detector is None:
@@ -134,7 +133,7 @@ async def get_status(websocket):
             elif status == 2:
                 status = 'Started'
             else:
-                status = 'Error'
+                status = status
 
         except Exception as e:
             status = 'Unknown'
