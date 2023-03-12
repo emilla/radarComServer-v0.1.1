@@ -41,8 +41,8 @@ async def message_router(websocket, path):
                 await consumer_request_handler(websocket, message['data'])
             elif next(iter(message.keys())) == 'cmd':
                 switcher = {
-                    'start_detection': start_detection_cmd,
-                    'stop_detection': stop_detection_cmd,
+                    'start_detection': start_detection,
+                    'stop_detection': stop_detection,
                     'connect_to_radar_module': connect_to_radar_module
                 }
                 # Get the function from switcher dictionary and call it passing the data dictionary as argument
@@ -108,11 +108,11 @@ async def connect_to_radar_module(data):
     await asyncio.sleep(0.1)
 
 
-async def start_detection_cmd(mod_config):
+async def start_detection(mod_config):
     pass
 
 
-async def stop_detection_cmd(message):
+async def stop_detection(message):
     global detector
     if detector is not None:
         await detector.stop_detection()
