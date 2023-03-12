@@ -91,12 +91,6 @@ class RadarModule:
         await self.streaming_control.set_value(0x1)
         return await self.status.get_value()
 
-    async def get_module_status_definition(self):
-        """
-        Get module status
-        :return:  status as int
-        """
-        return await self.status.get_definition()
 
     @staticmethod
     def _validate_com_config(com_config):

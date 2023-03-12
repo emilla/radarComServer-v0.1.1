@@ -89,7 +89,7 @@ async def open_serial_cmd(data):
 
     global detector
     detector = PresenceDetector(com_config)
-    status = await detector.get_module_status_definition()
+    status = await detector.status.get_value_with_definition()
 
     print(f"Instance of PresenceDetector is available. Status: {status}")
     await asyncio.sleep(0.1)
@@ -133,7 +133,7 @@ async def get_status_req(websocket):
         status = 'Not connected'
     else:
         try:
-            status = await detector.get_module_status_definition()
+            status = await detector.status.get_value_with_definition()
         except Exception as e:
             status = f'Unknown error: {e}'
 

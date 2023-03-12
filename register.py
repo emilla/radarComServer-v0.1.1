@@ -87,20 +87,19 @@ class Register:
         else:
             return
 
-    async def get_definition(self):
+    async def get_value_with_definition(self):
         """
-        Get the definition of the register
-        :return: string with the definition of the register
+        Get the value of the register and return the definition of the value
+        :return: string with the definition of the value
         """
-        if self.read and self.options:
+        if self.options:
             value = await self.get_value()
-            print(f"get_definition value: {value}")
             if value in self.options:
                 return self.options[value]
             else:
-                return f'This value: {value} is not defined'
+                return
         else:
-            raise ValueError('Register is not readable in get_definition')
+            raise ValueError('This register does not have options')
 
     async def set_value(self, value: int):
         """
