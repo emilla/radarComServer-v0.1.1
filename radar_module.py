@@ -128,6 +128,7 @@ class RadarModule:
         """
         for key, value in register_map.items():
             setattr(self, key, Register.from_dict(value, self.com))
+            print(f"Register {key} created")
 
     @staticmethod
     async def _configure_module(self, config) -> None:

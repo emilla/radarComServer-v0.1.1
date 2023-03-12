@@ -9,7 +9,7 @@ class Register:
     """
 
     @classmethod
-    def from_dict(cls, register_dict: dict, com: SerialCom, options=None) -> 'Register':
+    def from_dict(cls, register_dict: dict, com: SerialCom) -> 'Register':
         """
         Create a register from a dictionary, the dictionary should contain the "address", the "rw" read/write
         permissions, a SerialCom object to communicate with the module and an optional "options" dictionary.
@@ -18,7 +18,7 @@ class Register:
         :param options:  dictionary with options for the register
         :return: Register object
         """
-        return cls(address=register_dict['address'], rw=register_dict['rw'], com=com, options=options)
+        return cls(address=register_dict['address'], rw=register_dict['rw'], com=com, options=register_dict['options'])
 
     @classmethod
     async def definition_matches_value(cls, register, wanted_definition) -> bool:
