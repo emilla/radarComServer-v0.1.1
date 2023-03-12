@@ -13,8 +13,9 @@ address = "atom-radpi-01.local"
 PORT = 7890
 
 
-def detector_data_handler(presence, score, distance):
+def detector_data_handler(presence, score, distance, ws):
     score = "{:.2f}".format(score)
+    global display
     distance = "{:.1f}".format(distance)
     print(f'Presence: {"Person" if presence else "Empty"} || score={score} || distance={distance} meters')
     # convert score to string
@@ -24,6 +25,9 @@ def detector_data_handler(presence, score, distance):
     else:
         display.draw_text('Vacant')
     display.clear_display()
+
+    # Send data to all connected consumers
+    ws.send(f"{{\"presence\": {presence}, \"score\": {score}, \"distance\": {distance}}}")
 
 
 # Initialize detector
@@ -109,8 +113,26 @@ async def connect_to_radar_module(data):
     await asyncio.sleep(0.1)
 
 
-async def start_detection(mod_config):
-    pass
+async def start_detection(data):
+    """
+    Start the presence detection process
+    :param mod_config: A dictionary containing the configuration data for the radar module
+    :return:
+    """
+    mod_config = {
+        'streaming_control': int(data['streaming_control']),
+        'mode_selection': int(data['mode_selection']),
+        'range_start': int(data['range_start']),
+        'range_length': int(data['range_length']),
+        'update_rate': int(data['update_rate']),
+        'profile_selection': int(data['profile_selection']),
+    }
+
+    global detector
+    if detector is not None:
+        await detector.start_detection(detector_data_handler, mod_config, 30)
+    else:
+        raise Exception('No radar module connected')
 
 
 async def stop_detection(message):

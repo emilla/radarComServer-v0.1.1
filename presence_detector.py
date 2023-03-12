@@ -2,6 +2,7 @@ from radar_module import RadarModule
 import time
 import struct
 from communicator import SerialCom
+import websockets
 
 
 # detector class extends xm_module
@@ -61,7 +62,7 @@ class PresenceDetector(RadarModule):
         }
         # set default configuration
 
-    async def start_detection(self, duration=60, data_handler_func=None, mod_config=None):
+    async def start_detection(self, data_handler_func=None, mod_config=None, duration=60):
         """
         Start detector and print results
         Start detector and print results
@@ -80,18 +81,20 @@ class PresenceDetector(RadarModule):
 
         await super()._initialize_module(self, mod_config)
 
-        # Run module
-        print("Starting detector")
-        start = time.monotonic()
-        while time.monotonic() - start < duration:
+        # open websocket connection to server
+        async with websockets.connect('ws://atom-radpi-01.local:7890') as ws:
+            # Run module
+            print("Starting detector")
+            start = time.monotonic()
+            while time.monotonic() - start < duration:
 
-            stream = self.com.read_stream()
-            _result_info, buffer = SerialCom.decode_streaming_buffer(stream)
+                stream = self.com.read_stream()
+                _result_info, buffer = SerialCom.decode_streaming_buffer(stream)
 
-            (presence, score, distance) = struct.unpack("<bff", buffer)
+                (presence, score, distance) = struct.unpack("<bff", buffer)
 
-            if data_handler_func:
-                data_handler_func(presence=presence, score=score, distance=distance)
+                if data_handler_func:
+                    data_handler_func(presence=presence, score=score, distance=distance, ws=ws)
 
     async def stop_detector(self, clean_up_func=None):
         """
