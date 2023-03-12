@@ -146,7 +146,7 @@ class RadarModule:
             # get register from instance of the class by name (key)
             register = getattr(self, key)
             # set value of current register
-            print(f"Setting {key} to {value}")
+            print(f"Setting {register} to {value} {type(value)}")
             if isinstance(value, int):
                 await register.set_value(value)
                 print(f"-{key} set to: {await register.get_value()}")
