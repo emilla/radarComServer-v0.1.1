@@ -112,8 +112,12 @@ async def start_detection_cmd(mod_config):
     pass
 
 
-def stop_detection_cmd():
-    pass
+async def stop_detection_cmd(message):
+    global detector
+    if detector is not None:
+        await detector.stop_detection()
+        detector = None
+
 
 
 async def get_status(websocket):
