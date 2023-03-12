@@ -36,11 +36,25 @@ class PresenceDetector(RadarModule):
             },
             'profile_selection': {
                 'address': 0x28,
-                'rw': (True, True)
+                'rw': (True, True),
+                'options': {
+                    1: 'profile_1',
+                    2: 'profile_2',
+                    3: 'profile_3',
+                    4: 'profile_4',
+                    5: 'profile_5',
+                }
             },
             'sensor_power_mode': {
                 'address': 0x25,
-                'rw': (True, True)
+                'rw': (True, True),
+                'options': {
+                    0: 'off',
+                    1: 'sleep',
+                    2: 'ready',
+                    3: 'active',
+                    4: 'hibernate'
+                }
             }
         }
 
@@ -62,7 +76,7 @@ class PresenceDetector(RadarModule):
         }
         # set default configuration
 
-    async def start_detection(self, data_handler_func=None, mod_config=None, duration=60):
+    async def start_detector(self, data_handler_func=None, mod_config=None, duration=60):
         """
         Start detector and print results
         Start detector and print results
@@ -79,22 +93,21 @@ class PresenceDetector(RadarModule):
         else:
             mod_config = self.default_mod_config
 
-        await super()._initialize_module(self, mod_config)
+        await super()._create_module(self, mod_config)
+        await super()._activate_module(self)
 
-        # open websocket connection to server
-        async with websockets.connect('ws://atom-radpi-01.local:7890/producer') as ws:
-            # Run module
-            print("Starting detector")
-            start = time.monotonic()
-            while time.monotonic() - start < duration:
+        # Run module
+        print("Starting detector")
+        start = time.monotonic()
+        while time.monotonic() - start < duration:
 
-                stream = self.com.read_stream()
-                _result_info, buffer = SerialCom.decode_streaming_buffer(stream)
+            stream = self.com.read_stream()
+            _result_info, buffer = SerialCom.decode_streaming_buffer(stream)
 
-                (presence, score, distance) = struct.unpack("<bff", buffer)
+            (presence, score, distance) = struct.unpack("<bff", buffer)
 
-                if data_handler_func:
-                    await data_handler_func(presence=presence, score=score, distance=distance, ws=ws)
+            if data_handler_func:
+                await data_handler_func(presence=presence, score=score, distance=distance)
 
     async def stop_detector(self, clean_up_func=None):
         """

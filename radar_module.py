@@ -10,19 +10,51 @@ class RadarModule:
         self.general_register_map = {
             'mode_selection': {
                 'address': 0x2,
-                'rw': (True, True)
+                'rw': (True, True),
+                'options': {
+                    0x1: 'power_bins',
+                    0x2: 'Envelope',
+                    0x4: 'sparse',
+                    0x200: 'distance',
+                    0x400: 'presence'
+                }
             },
             'main_control': {
                 'address': 0x3,
-                'rw': (True, True)
+                'rw': (False, True),
+                'options': {
+                    0: 'stop',
+                    1: 'create',
+                    2: 'activate',
+                    3: 'create_activate',
+                    4: 'clear_status',
+                }
             },
             'status': {
                 'address': 0x6,
-                'rw': (True, False)
+                'rw': (True, False),
+                'options': {
+                    0: "No bits set",
+                    0x000000FF: "Bits can't be cleared with clear_status",
+                    0xFFFFFF00: "Mask with bits that can be cleared",
+                    0xFFFF0000: "Mask with Error bits",
+                    0x00000001: "Server or Detector Created",
+                    0x00000002: "Server or Detector Activated",
+                    0x00000100: "Data is ready to be read from the buffer",
+                    0x00010000: "Error occurred in the module",
+                    0x00020000: "Invalid command or parameter received",
+                    0x00040000: "Invalid mode",
+                    0x00080000: "Error creating the requested service or detector",
+                    0x00100000: "Error activating the requested service or detector",
+                    0x00200000: "An attempt to write a register or read the buffer when the module is in wrong state"
+                }
             },
             'product_identification': {
                 'address': 0x10,
-                'rw': (True, False)
+                'rw': (True, False),
+                'options': {
+                    0xACC2: "XM132"
+                }
             },
             'product_version': {
                 'address': 0x11,
@@ -30,7 +62,11 @@ class RadarModule:
             },
             'streaming_control': {
                 'address': 0x05,
-                'rw': (True, True)
+                'rw': (True, True),
+                'options': {
+                    0: 'streaming_disabled',
+                    1: 'streaming_enabled'
+                }
             }
         }
 
@@ -54,6 +90,13 @@ class RadarModule:
         """
         await self.streaming_control.set_value(0x1)
         return await self.status.get_value()
+
+    async def get_module_status_definition(self):
+        """
+        Get module status
+        :return:  status as int
+        """
+        return await self.status.get_definition()
 
     @staticmethod
     def _validate_com_config(com_config):
@@ -102,32 +145,42 @@ class RadarModule:
             # get register from instance of the class by name (key)
             register = getattr(self, key)
             # set value of current register
-            await register.set_value(value)
-            print(f"-{key} set to: {await register.get_value()}")
+            print(f"Setting {key} to {value}")
+            if value is type(int):
+                await register.set_value(value)
+                print(f"-{key} set to: {await register.get_value()}")
+            elif value is type(str):
+                await register.set_by_definition(value)
+                print(f"-{key} set to: {await register.get_definition()}")
 
     @staticmethod
-    async def _initialize_module(self, config=None):
+    async def _create_module(self, config=None):
         """
         Initialize module with config parameter if given
         :param self:  instance of the class
         :param config:  dictionary with the configuration parameters. Requires keys: range_start, range_length,
-        :return:  None
+        :return:  bool: True if successful, False if not
         """
         try:
             await self._stop_clear_module(self)
-            print("Module stopped")
-
             await self._configure_module(self, config)
+            await self.main_control.set_value(1)
+            if not await Register.value_matches(self.status, 0x0008000):
+                print(f"Module not ready, status: {await self.status.get_value()}")
+                return False
+            return True
+        except Exception as e:
+            print(f"Error while creating module: {e}")
+            return False
 
-            # create & activate module
-            # TODO: split into two functions, one for creating and one for activating
-            print("Activating module")
-            await self.main_control.set_value(3)
-
-            # confirm module to be activated
+    @staticmethod
+    async def _activate_module(self):
+        print("Activating module")
+        try:
+            await self.main_control.set_value(2)
             return await Register.value_matches(self.status, 1)
         except Exception as e:
-            print(f"Error while initializing module: {e}")
+            print(f"Error while activating module: {e}")
             return False
 
     @staticmethod
