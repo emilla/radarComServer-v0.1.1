@@ -98,9 +98,9 @@ def connect_to_radar_module(data):
     """
     com_config = {
         'port': data['port'],
-        'baudrate': data['baudrate'],
-        'rtscts': data['rtscts'],
-        'timeout': data['timeout']
+        'baudrate': int(data['baudrate']),
+        'rtscts': bool(data['rtscts']),
+        'timeout': int(data['timeout'])
     }
 
     global detector
