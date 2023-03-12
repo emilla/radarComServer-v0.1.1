@@ -13,7 +13,7 @@
 
 {"cmd": "stop_detector", "data": "None"}
 
-{"cmd": "connect_to_radar_module",
+{"cmd": "open_serial",
     {"data":
         {
            "port": "/dev/ttyUSB0",
