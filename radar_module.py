@@ -170,7 +170,6 @@ class RadarModule:
             print(f"Error while creating module: {e}")
             return False
 
-    @staticmethod
     async def activate_module(self):
         print("Activating module")
         if await Register.value_matches(self.status, 1):
