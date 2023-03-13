@@ -102,7 +102,7 @@ async def start_detector_cmd(websocket, data):
             await asyncio.sleep(0.1)
             await websocket.send(json.dumps({'ack': 'success', 'data': {'comment': 'Module activated, starting module'}}))
 
-        if await detector.start_detector(detector_data_handler, 30):
+        if await detector.start_stream(detector_data_handler, 30):
             # detector handler will be called everytime a new data is received
             await asyncio.sleep(0.1)
     else:
