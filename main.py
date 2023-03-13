@@ -35,10 +35,10 @@ async def message_router(websocket, path):
     global consumers
     while True:
         try:
-            print("A consumer just connected")
-
             global consumers
-            consumers.add(websocket)
+            if websocket not in consumers:
+                print("A new client has just connected")
+                consumers.add(websocket)
             payload = await websocket.recv()
 
             message = json.loads(payload)
@@ -76,7 +76,7 @@ async def open_serial_cmd(websocket, data):
     detector = PresenceDetector(com_config)
     print("detector instantiated & communicator configured with port:" + data['port'])
     await asyncio.sleep(0.1)
-    await websocket.send(json.dumps({'ack': 'success', 'data': 'None'}))
+    await websocket.send(json.dumps({'ack': 'success', 'data': {'comment': 'Serial port opened'}}))
 
 
 async def start_detector_cmd(websocket, data):
@@ -106,7 +106,7 @@ async def start_detector_cmd(websocket, data):
             # detector handler will be called everytime a new data is received
             await asyncio.sleep(0.1)
     else:
-        status, status_def = await detector.get_status()
+        status, status_def = await detector.get_module_status()
         raise Exception(
             f'Something went wrong, module not created & activated, detector status: {status} - {status_def}')
 
@@ -115,7 +115,7 @@ async def stop_detector_cmd(websocket, data=None):
     global detector
     if detector is not None:
         if await detector.stop_module():
-            await websocket.send(json.dumps({'ack': 'success', 'data': 'None'}))
+            await websocket.send(json.dumps({'ack': 'success', 'data': {'comment': 'Module stopped'}}))
             detector = None
         else:
             raise Exception('Failed to stop detector')
@@ -128,7 +128,7 @@ async def get_status_req(websocket, data=None):
         status_def = 'No serial connection opened'
     else:
         try:
-            status, status_def = await detector.get_status()
+            status, status_def = await detector.get_module_status()
         except Exception as e:
             status = 'null'
             status_def = f'Unknown error: {e}'
