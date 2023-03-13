@@ -76,12 +76,10 @@ class PresenceDetector(RadarModule):
         }
         # set default configuration
 
-    async def start_stream(self, data_handler_func=None, duration=60):
+    async def start_stream(self, data_handler_func=None):
         print("Starting detector")
-        start = time.monotonic()
 
-        while time.monotonic() - start < duration:
-
+        while True:
             stream = self.com.read_stream()
             _result_info, buffer = SerialCom.decode_streaming_buffer(stream)
 

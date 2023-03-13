@@ -94,21 +94,24 @@ async def start_detector_cmd(websocket, data):
         if await detector.create_module(mod_config):
             print("module created")
             await asyncio.sleep(0.1)
-            await websocket.send(json.dumps({'ack': 'success', 'data': {'comment': 'Module created, activating module'}}))
-
-        # activate module
-        if await detector.activate_module():
-            print("module activated")
-            await asyncio.sleep(0.1)
-            await websocket.send(json.dumps({'ack': 'success', 'data': {'comment': 'Module activated, starting module'}}))
-
-        if await detector.start_stream(detector_data_handler, 30):
-            # detector handler will be called everytime a new data is received
-            await asyncio.sleep(0.1)
-    else:
-        status, status_def = await detector.get_module_status()
-        raise Exception(
-            f'Something went wrong, module not created & activated, detector status: {status} - {status_def}')
+            await websocket.send(
+                json.dumps({'ack': 'success', 'data': {'comment': 'Module created, activating module'}}))
+            # activate module
+            if await detector.activate_module():
+                print("module activated")
+                await asyncio.sleep(0.1)
+                await websocket.send(
+                    json.dumps({'ack': 'success', 'data': {'comment': 'Module activated, starting module'}}))
+                try:
+                    loop = asyncio.get_event_loop()
+                    loop.create_task(asyncio.wait_for(detector.start_stream(detector_data_handler), timeout=30))
+                    loop.run_forever()
+                except asyncio.TimeoutError:
+                    print("Error starting stream")
+        else:
+            status, status_def = await detector.get_module_status()
+            raise Exception(
+                f'Something went wrong, module not created & activated, detector status: {status} - {status_def}')
 
 
 async def stop_detector_cmd(websocket, data=None):
