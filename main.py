@@ -3,6 +3,7 @@ import websockets
 from presence_detector import PresenceDetector
 import asyncio
 import json
+import threading
 
 # Global variables
 detector = None
@@ -103,9 +104,8 @@ async def start_detector_cmd(websocket, data):
                 await websocket.send(
                     json.dumps({'ack': 'success', 'data': {'comment': 'Module activated, starting module'}}))
                 try:
-                    loop = asyncio.get_event_loop()
-                    loop.create_task(asyncio.wait_for(detector.start_stream(detector_data_handler), timeout=30))
-                    loop.run_forever()
+                    thread = threading.Thread(target=detector.start_stream, args=(detector_data_handler,))
+                    thread.start()
                 except asyncio.TimeoutError:
                     print("Error starting stream")
         else:
