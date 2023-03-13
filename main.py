@@ -50,7 +50,8 @@ async def message_router(websocket, path):
                 switcher = {
                     'start_detector': start_detector_cmd,
                     'stop_detector': stop_detector_cmd,
-                    'open_serial': open_serial_cmd
+                    'open_serial': open_serial_cmd,
+                    'request_status': get_status_req,
                 }
                 # Get the function from switcher dictionary and call it passing the data dictionary as argument
                 await switcher[message['cmd']](websocket, message['data'])
@@ -104,6 +105,13 @@ async def start_detector_cmd(websocket, data):
                     json.dumps({'ack': 'success', 'data': {'comment': 'Module activated, starting module'}}))
 
                 await detector.start_stream(detector_data_handler, 60)
+                status, status_def = await detector.get_module_status()
+                await websocket.send(
+                    json.dumps({'resp': 'status',
+                                'data': {'status': status,
+                                         'status_def': status_def,
+                                         }
+                                }))
             else:
                 status, status_def = await detector.get_module_status()
                 raise Exception(
