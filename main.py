@@ -31,7 +31,6 @@ async def detector_data_handler(presence, score, distance):
     await broadcast_stream(message)
 
 
-# Initialize detector
 async def message_router(websocket, path):
     global consumers
     while True:
@@ -44,7 +43,11 @@ async def message_router(websocket, path):
 
             message = json.loads(payload)
             if next(iter(message.keys())) == 'req':
-                await consumer_request_handler(websocket, message['data'])
+                switcher = {
+                    'status': get_status_req,
+                }
+                # Get the function from switcher dictionary and call it passing the data dictionary as argument
+                await switcher[message['req']](websocket, message['data'])
             elif next(iter(message.keys())) == 'cmd':
                 switcher = {
                     'start_detector': start_detector_cmd,
@@ -52,7 +55,7 @@ async def message_router(websocket, path):
                     'open_serial': open_serial_cmd
                 }
                 # Get the function from switcher dictionary and call it passing the data dictionary as argument
-                await switcher[message['cmd']](message['data'])
+                await switcher[message['cmd']](websocket, message['data'])
             # Handle disconnecting clients
         except websockets.exceptions.ConnectionClosed as e:
             print("A client just disconnected")
@@ -61,25 +64,7 @@ async def message_router(websocket, path):
     #     consumers.remove(websocket)
 
 
-async def consumer_request_handler(websocket, data):
-    """
-    Handle requests from consumer clients, calls appropriate functions based on request type.
-    :param websocket:
-    :param data:
-    :return: None
-    """
-    if data['type'] == 'status':
-        await get_status_req(websocket)
-    else:
-        raise Exception('Invalid request type')
-
-
-async def open_serial_cmd(data):
-    """
-    Create an instance of the PresenceDetector class and store it in the global variable detector.
-    :param data: A dictionary containing the configuration data for the radar module
-    :return:
-    """
+async def open_serial_cmd(websocket, data):
     com_config = {
         'port': data['port'],
         'baudrate': int(data['baudrate']),
@@ -89,18 +74,12 @@ async def open_serial_cmd(data):
 
     global detector
     detector = PresenceDetector(com_config)
-    status = await detector.status.get_value_with_definition()
-
-    print(f"Instance of PresenceDetector is available. Status: {status}")
+    print("detector instantiated & communicator configured with port:" + data['port'])
     await asyncio.sleep(0.1)
+    websocket.send(json.dumps({'ack': 'success', 'data': 'None'}))
 
 
-async def start_detector_cmd(data):
-    """
-    Start the presence detection process
-    :param data: A dictionary containing the configuration data for the radar module
-    :return:
-    """
+async def start_detector_cmd(websocket, data):
     mod_config = {
         'streaming_control': data['streaming_control'],
         'mode_selection': data['mode_selection'],
@@ -110,35 +89,55 @@ async def start_detector_cmd(data):
         'profile_selection': data['profile_selection'],
         'sensor_power_mode': 'active',
     }
-
     global detector
     if detector is not None:
-        await detector.start_detector(detector_data_handler, mod_config, 30)
+        if await detector.create_module(mod_config):
+            print("module created")
+            await asyncio.sleep(0.1)
+            websocket.send(json.dumps({'ack': 'success', 'data': {'comment': 'Module created, activating module'}}))
+
+        # activate module
+        if await detector.activate_module():
+            print("module activated")
+            await asyncio.sleep(0.1)
+            websocket.send(json.dumps({'ack': 'success', 'data': {'comment': 'Module activated, starting module'}}))
+
+        if await detector.start_detector(detector_data_handler, 30):
+            # detector handler will be called everytime a new data is received
+            await asyncio.sleep(0.1)
     else:
-        raise Exception('No radar module connected')
+        status, status_def = await detector.get_status()
+        raise Exception(
+            f'Something went wrong, module not created & activated, detector status: {status} - {status_def}')
 
 
-async def stop_detector_cmd(message):
+async def stop_detector_cmd(websocket, data=None):
     global detector
     if detector is not None:
-        if await detector.stop_detector():
+        if await detector.stop_module():
+            websocket.send(json.dumps({'ack': 'success', 'data': 'None'}))
             detector = None
         else:
             raise Exception('Failed to stop detector')
 
 
-async def get_status_req(websocket):
+async def get_status_req(websocket, data=None):
     global detector
     if detector is None:
-        status = 'Not connected'
+        status = 'null'
+        status_def = 'No serial connection opened'
     else:
         try:
-            status = await detector.status.get_value_with_definition()
+            status, status_def = await detector.get_status()
         except Exception as e:
-            status = f'Unknown error: {e}'
+            status = 'null'
+            status_def = f'Unknown error: {e}'
 
     await websocket.send(json.dumps({'resp': 'status',
-                                     'data': {'module_status': status}}))
+                                     'data': {'status': status,
+                                              'status_def': status_def
+                                              }
+                                     }))
 
 
 async def broadcast_stream(message):
@@ -155,22 +154,3 @@ async def broadcast_stream(message):
 start_server = websockets.serve(message_router, address, PORT)
 asyncio.get_event_loop().run_until_complete(start_server)
 asyncio.get_event_loop().run_forever()
-
-# detector = PresenceDetector({
-#     'port': '/dev/ttyUSB0',
-#     'baudrate': 115200,
-#     'rtscts': True,
-#     'timeout': 2
-# })
-# await detector.start_detection(
-#     duration=60,
-#     data_handler_func=detector_data_handler,
-#     mod_config={
-#         'streaming_control': 0x1,
-#         'mode_selection': 0x400,
-#         'range_start': 500,
-#         'range_length': 5000,
-#         'update_rate': 1000,
-#         'profile_selection': 5,
-#         'sensor_power_mode': 3
-#     })

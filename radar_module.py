@@ -40,6 +40,7 @@ class RadarModule:
                     0xFFFF0000: "Mask with Error bits",
                     0x00000001: "Server or Detector Created",
                     0x00000002: "Server or Detector Activated",
+                    0x00000003: "Server or Detector Created and Activated",
                     0x00000100: "Data is ready to be read from the buffer",
                     0x00010000: "Error occurred in the module",
                     0x00020000: "Invalid command or parameter received",
@@ -77,7 +78,6 @@ class RadarModule:
         Get module identification and version
         :return:  identification, version as tuple
         """
-        await self.streaming_control.set_value(0x1)
         identification = await self.product_identification.get_value()
         version = await self.product_version.get_value()
         status = await self.status.get_value()
@@ -88,9 +88,9 @@ class RadarModule:
         Get module status
         :return:  status as int
         """
-        await self.streaming_control.set_value(0x1)
-        return await self.status.get_value()
-
+        status = await self.status.get_value()
+        s_definition = await self.status.get_value_with_definition()
+        return status, s_definition
 
     @staticmethod
     def _validate_com_config(com_config):
@@ -147,8 +147,7 @@ class RadarModule:
                 await register.set_by_definition(value)
                 print(f"-{key} set to: {await register.get_value_with_definition()}")
 
-    @staticmethod
-    async def _create_module(self, config=None):
+    async def create_module(self, config=None):
         """
         Initialize module with config parameter if given
         :param self:  instance of the class
@@ -156,14 +155,15 @@ class RadarModule:
         :return:  bool: True if successful, False if not
         """
         try:
-            await self._stop_clear_module(self)
+            await self.stop_module()
+            await self.clear_module()
             await self._configure_module(self, config)
             await self.main_control.set_value(1)
-            status_def = await self.status.get_value_with_definition()
-            status = await self.status.get_value()
-            print(f'Sensor status: {status} : { status_def}')
-            if not await Register.value_matches(self.status, 1):
-                print(f"Module not ready, status: {await self.status.get_value()}")
+            status, status_def = await self.get_module_status()
+            print(f'Sensor status: {status} : {status_def}')
+
+            if status != 1:
+                print(f"Unexpected status: {status_def}")
                 return False
             return True
         except Exception as e:
@@ -171,32 +171,40 @@ class RadarModule:
             return False
 
     @staticmethod
-    async def _activate_module(self):
+    async def activate_module(self):
         print("Activating module")
-        try:
-            await self.main_control.set_value(2)
-            status_def = await self.status.get_value_with_definition()
-            status = await self.status.get_value()
-            print(f'Sensor status: {status} : { status_def}')
-            return await Register.value_matches(self.status, 2)
-        except Exception as e:
-            print(f"Error while activating module: {e}")
-            return False
+        if await Register.value_matches(self.status, 1):
+            try:
+                await self.main_control.set_value(2)
+                status, status_def = await self.get_module_status()
+                print(f'Sensor status: {status} : {status_def}')
+                return await Register.value_matches(self.status, 2)
+            except Exception as e:
+                print(f"Error while activating module: {e}")
+                return False
+        else:
+            raise ValueError("Module not in correct state")
 
-    @staticmethod
-    async def _stop_clear_module(self):
+    async def stop_module(self):
         """
         Stop module and clear bits
         :return:
         """
         cmd_stop = 0
         await self.main_control.set_value(cmd_stop)
-        status_def = await self.status.get_value_with_definition()
-        status = await self.status.get_value()
-        print(f'Sensor status: {status} : { status_def}')
+        status, status_def = await self.get_module_status()
+        print(f"stop_module, result status: {status} : {status_def}")
+        if status != 3 or status != 2:
+            return True
+        else:
+            return False
 
+    async def clear_module(self):
         cmd_clear_bits = 4
         await self.main_control.set_value(cmd_clear_bits)
-        print("Module stopped and cleared")
-        if await Register.value_matches(self.status, 0):
+        status, status_def = await self.get_module_status()
+        print(f"clear_module, result status: {status} : {status_def}")
+        if status == 0:
             return True
+        else:
+            return False
