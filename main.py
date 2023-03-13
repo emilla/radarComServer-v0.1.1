@@ -33,14 +33,12 @@ async def detector_data_handler(presence, score, distance):
 
 async def message_router(websocket, path):
     global consumers
-    while True:
-        try:
-            global consumers
-            if websocket not in consumers:
-                print("A new client has just connected")
-                consumers.add(websocket)
+    try:
+        if websocket not in consumers:
+            print("A new client has just connected")
+            consumers.add(websocket)
+        while True:
             payload = await websocket.recv()
-
             message = json.loads(payload)
             if next(iter(message.keys())) == 'req':
                 switcher = {
@@ -56,11 +54,11 @@ async def message_router(websocket, path):
                 }
                 # Get the function from switcher dictionary and call it passing the data dictionary as argument
                 await switcher[message['cmd']](websocket, message['data'])
-            # Handle disconnecting clients
-        except websockets.exceptions.ConnectionClosed as e:
-            print("A client just disconnected")
-        finally:
-            consumers.remove(websocket)
+    except websockets.exceptions.ConnectionClosed as e:
+        print("A client just disconnected")
+    finally:
+        consumers.remove(websocket)
+
 
 
 async def open_serial_cmd(websocket, data):
