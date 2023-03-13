@@ -3,7 +3,6 @@ import websockets
 from presence_detector import PresenceDetector
 import asyncio
 import json
-import threading
 
 # Global variables
 detector = None
@@ -97,21 +96,21 @@ async def start_detector_cmd(websocket, data):
             await asyncio.sleep(0.1)
             await websocket.send(
                 json.dumps({'ack': 'success', 'data': {'comment': 'Module created, activating module'}}))
-            # activate module
-            if await detector.activate_module():
-                print("module activated")
-                await asyncio.sleep(0.1)
-                await websocket.send(
-                    json.dumps({'ack': 'success', 'data': {'comment': 'Module activated, starting module'}}))
-                try:
-                    thread = threading.Thread(target=detector.start_stream, args=(detector_data_handler,))
-                    thread.start()
-                except asyncio.TimeoutError:
-                    print("Error starting stream")
-        else:
-            status, status_def = await detector.get_module_status()
-            raise Exception(
-                f'Something went wrong, module not created & activated, detector status: {status} - {status_def}')
+
+        # activate module
+        if await detector.activate_module():
+            print("module activated")
+            await asyncio.sleep(0.1)
+            await websocket.send(
+                json.dumps({'ack': 'success', 'data': {'comment': 'Module activated, starting module'}}))
+
+        await detector.start_stream(detector_data_handler, 30):
+        # detector handler will be called everytime a new data is received
+        await asyncio.sleep(0.1)
+    else:
+    status, status_def = await detector.get_module_status()
+    raise Exception(
+        f'Something went wrong, module not created & activated, detector status: {status} - {status_def}')
 
 
 async def stop_detector_cmd(websocket, data=None):
