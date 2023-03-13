@@ -60,7 +60,6 @@ async def message_router(websocket, path):
         consumers.remove(websocket)
 
 
-
 async def open_serial_cmd(websocket, data):
     com_config = {
         'port': data['port'],
@@ -70,6 +69,9 @@ async def open_serial_cmd(websocket, data):
     }
 
     global detector
+    if detector is not None:
+        await detector.stop_module()
+        await detector.clear_module()
     detector = PresenceDetector(com_config)
     print("detector instantiated & communicator configured with port:" + data['port'])
     await asyncio.sleep(0.1)
@@ -94,14 +96,14 @@ async def start_detector_cmd(websocket, data):
             await websocket.send(
                 json.dumps({'ack': 'success', 'data': {'comment': 'Module created, activating module'}}))
 
-        # activate module
+            # activate module
             if await detector.activate_module():
                 print("module activated")
                 await asyncio.sleep(0.1)
                 await websocket.send(
                     json.dumps({'ack': 'success', 'data': {'comment': 'Module activated, starting module'}}))
 
-                await detector.start_stream(detector_data_handler, 30)
+                await detector.start_stream(detector_data_handler, 60)
             else:
                 status, status_def = await detector.get_module_status()
                 raise Exception(
