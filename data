@@ -13,6 +13,8 @@
 
 {"cmd": "stop_detector", "data": "None"}
 
+{"cmd": "start_detector", "data": "None"}
+
 {"cmd": "open_serial",
     "data":
         {

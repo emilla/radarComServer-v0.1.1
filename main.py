@@ -76,7 +76,7 @@ async def open_serial_cmd(websocket, data):
     detector = PresenceDetector(com_config)
     print("detector instantiated & communicator configured with port:" + data['port'])
     await asyncio.sleep(0.1)
-    websocket.send(json.dumps({'ack': 'success', 'data': 'None'}))
+    await websocket.send(json.dumps({'ack': 'success', 'data': 'None'}))
 
 
 async def start_detector_cmd(websocket, data):
@@ -94,13 +94,13 @@ async def start_detector_cmd(websocket, data):
         if await detector.create_module(mod_config):
             print("module created")
             await asyncio.sleep(0.1)
-            websocket.send(json.dumps({'ack': 'success', 'data': {'comment': 'Module created, activating module'}}))
+            await websocket.send(json.dumps({'ack': 'success', 'data': {'comment': 'Module created, activating module'}}))
 
         # activate module
         if await detector.activate_module():
             print("module activated")
             await asyncio.sleep(0.1)
-            websocket.send(json.dumps({'ack': 'success', 'data': {'comment': 'Module activated, starting module'}}))
+            await websocket.send(json.dumps({'ack': 'success', 'data': {'comment': 'Module activated, starting module'}}))
 
         if await detector.start_detector(detector_data_handler, 30):
             # detector handler will be called everytime a new data is received
@@ -115,7 +115,7 @@ async def stop_detector_cmd(websocket, data=None):
     global detector
     if detector is not None:
         if await detector.stop_module():
-            websocket.send(json.dumps({'ack': 'success', 'data': 'None'}))
+            await websocket.send(json.dumps({'ack': 'success', 'data': 'None'}))
             detector = None
         else:
             raise Exception('Failed to stop detector')
