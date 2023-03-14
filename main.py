@@ -104,7 +104,7 @@ async def start_detector_cmd(websocket, data):
                 await websocket.send(
                     json.dumps({'ack': 'success', 'data': {'comment': 'Module activated, starting module'}}))
 
-                await detector.start_stream(detector_data_handler, 60)
+                asyncio.create_task(detector.start_stream(detector_data_handler, 60))
                 status, status_def = await detector.get_module_status()
                 await websocket.send(
                     json.dumps({'resp': 'status',
